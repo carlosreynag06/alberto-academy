@@ -2,18 +2,18 @@
 
 This project uses Supabase CLI migrations for the CRM backend.
 
-## Local CLI
+## CLI
 
-Install the pinned Supabase CLI binary:
+Use the official npm execution path:
 
 ```powershell
-npm run supabase:install
+npx supabase@latest --version
 ```
 
-Verify it:
+Set a Supabase account access token only for the current PowerShell session:
 
 ```powershell
-npm run supabase -- --version
+$env:SUPABASE_ACCESS_TOKEN="sbp_your_real_access_token"
 ```
 
 ## Remote Project
@@ -24,22 +24,25 @@ Project ref:
 rryggmugbpxweqqiceqo
 ```
 
-Login to Supabase:
-
-```powershell
-npm run supabase -- login
-```
-
 Link this repo to the remote project:
 
 ```powershell
-npm run db:link
+npx supabase@latest link --project-ref rryggmugbpxweqqiceqo
 ```
 
 Push migrations:
 
 ```powershell
-npm run db:push
+npx supabase@latest db push
+```
+
+If the CLI asks for the database password, use the database password from Supabase project settings.
+
+## Vercel Environment
+
+```text
+NEXT_PUBLIC_SUPABASE_URL=https://rryggmugbpxweqqiceqo.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-publishable-key
 ```
 
 ## Migrations
