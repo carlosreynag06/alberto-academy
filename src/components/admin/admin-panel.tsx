@@ -1,9 +1,21 @@
 "use client";
 
-import { type FormEvent, type ReactNode, useMemo, useState } from "react";
+import { type FormEvent, type ReactNode, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
+import type { Lead, LeadStatus, Level, Student, StudentStatus } from "@/lib/crm-types";
+import {
+  clearAdminSession,
+  deleteLeadFromSupabase,
+  deleteStudentFromSupabase,
+  getAdminSession,
+  isSupabaseConfigured,
+  listLeads,
+  listStudents,
+  saveLeadToSupabase,
+  saveStudentToSupabase,
+  signInAdmin,
+} from "@/lib/supabase-rest";
 import {
   BarChart3,
   BookOpenCheck,
@@ -26,37 +38,6 @@ import {
 } from "lucide-react";
 
 type ActiveView = "dashboard" | "leads" | "students" | "courses" | "materials" | "settings";
-type LeadStatus = "New" | "Contacted" | "Trial booked" | "Won" | "Lost";
-type StudentStatus = "Active" | "Paused" | "Completed";
-type Level = "Beginner" | "Intermediate" | "Advanced" | "Not sure";
-
-type Lead = {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  interest: string;
-  level: Level;
-  status: LeadStatus;
-  source: string;
-  submittedAt: string;
-  notes: string;
-};
-
-type Student = {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  program: string;
-  level: Exclude<Level, "Not sure">;
-  status: StudentStatus;
-  progress: number;
-  lastSession: string;
-  nextSession: string;
-  goals: string;
-  notes: string;
-};
 
 const navItems: { label: string; view: ActiveView; icon: typeof LayoutDashboard; enabled: boolean }[] = [
   { label: "Dashboard", view: "dashboard", icon: LayoutDashboard, enabled: true },
@@ -74,108 +55,6 @@ const studentLevels: Student["level"][] = ["Beginner", "Intermediate", "Advanced
 const interests = ["English conversation", "Business English", "Exam prep", "Academic writing", "Spanish for foreigners", "Travel English"];
 const programs = ["Conversation Fluency", "Grammar & Writing", "Academic English", "Career English"];
 const sources = ["Website form", "Instagram", "WhatsApp", "Referral", "Facebook"];
-
-const firstNames = [
-  "Mariana",
-  "Carlos",
-  "Paola",
-  "Luis",
-  "Camila",
-  "Daniel",
-  "Sofia",
-  "Andres",
-  "Valeria",
-  "Miguel",
-  "Laura",
-  "Javier",
-  "Natalia",
-  "Rafael",
-  "Elena",
-  "Diego",
-  "Gabriela",
-  "Mateo",
-  "Isabel",
-  "Samuel",
-];
-
-const lastNames = [
-  "Reyes",
-  "Santos",
-  "Mendez",
-  "Castillo",
-  "Jimenez",
-  "Vargas",
-  "Morales",
-  "Pena",
-  "Herrera",
-  "Nunez",
-];
-
-const leadNotes = [
-  "Wants to speak with more confidence at work.",
-  "Asked about flexible scheduling and trial lesson details.",
-  "Needs English for travel and everyday communication.",
-  "Interested in interview preparation and pronunciation.",
-  "Requested information about group classes.",
-];
-
-const studentGoals = [
-  "Improve speaking confidence for meetings and client calls.",
-  "Prepare for interviews with stronger answers and vocabulary.",
-  "Build grammar accuracy and clearer writing habits.",
-  "Practice real conversations for travel and daily life.",
-  "Improve academic vocabulary and presentation structure.",
-];
-
-function makeDate(offset: number) {
-  const date = new Date(2026, 5, 28);
-  date.setDate(date.getDate() - offset);
-  return date.toISOString().slice(0, 10);
-}
-
-function makeLead(index: number): Lead {
-  const first = firstNames[index % firstNames.length];
-  const last = lastNames[Math.floor(index / firstNames.length) % lastNames.length];
-  const padded = String(index + 1).padStart(3, "0");
-
-  return {
-    id: `LD-${padded}`,
-    name: `${first} ${last}`,
-    email: `${first.toLowerCase()}.${last.toLowerCase()}${index + 1}@email.com`,
-    phone: `+1 (809) 555-${String(1000 + index).slice(-4)}`,
-    interest: interests[index % interests.length],
-    level: levels[index % levels.length],
-    status: leadStatuses[index % leadStatuses.length],
-    source: sources[index % sources.length],
-    submittedAt: makeDate(index % 21),
-    notes: leadNotes[index % leadNotes.length],
-  };
-}
-
-function makeStudent(index: number): Student {
-  const first = firstNames[(index * 3) % firstNames.length];
-  const last = lastNames[(index * 2) % lastNames.length];
-  const padded = String(index + 1).padStart(3, "0");
-  const progress = 28 + ((index * 9) % 63);
-
-  return {
-    id: `ST-${padded}`,
-    name: `${first} ${last}`,
-    email: `${first.toLowerCase()}.${last.toLowerCase()}@student.com`,
-    phone: `+1 (829) 555-${String(2000 + index).slice(-4)}`,
-    program: programs[index % programs.length],
-    level: studentLevels[index % studentLevels.length],
-    status: studentStatuses[index % studentStatuses.length],
-    progress,
-    lastSession: makeDate(index + 2),
-    nextSession: makeDate(-index - 3),
-    goals: studentGoals[index % studentGoals.length],
-    notes: "Mock student profile. Replace with real onboarding notes after Supabase is connected.",
-  };
-}
-
-const initialLeads = Array.from({ length: 10 }, (_, index) => makeLead(index));
-const initialStudents = Array.from({ length: 10 }, (_, index) => makeStudent(index));
 
 const emptyLead: Lead = {
   id: "",
@@ -205,10 +84,16 @@ const emptyStudent: Student = {
   notes: "",
 };
 
+function clampProgress(value: string) {
+  const progress = Number(value);
+  if (!Number.isFinite(progress)) return 0;
+  return Math.min(100, Math.max(0, Math.round(progress)));
+}
+
 export function AdminPanel() {
   const [activeView, setActiveView] = useState<ActiveView>("dashboard");
-  const [leads, setLeads] = useState<Lead[]>(initialLeads);
-  const [students, setStudents] = useState<Student[]>(initialStudents);
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [students, setStudents] = useState<Student[]>([]);
   const [leadSearch, setLeadSearch] = useState("");
   const [studentSearch, setStudentSearch] = useState("");
   const [leadStatusFilter, setLeadStatusFilter] = useState<"All" | LeadStatus>("All");
@@ -218,6 +103,53 @@ export function AdminPanel() {
   const [studentDraft, setStudentDraft] = useState<Student | null>(null);
   const [leadMode, setLeadMode] = useState<"add" | "edit">("edit");
   const [studentMode, setStudentMode] = useState<"add" | "edit">("edit");
+  const [syncMessage, setSyncMessage] = useState<string | null>(() =>
+    isSupabaseConfigured() ? null : "Connect Supabase environment variables to load CRM data",
+  );
+
+  useEffect(() => {
+    if (!isSupabaseConfigured()) {
+      return;
+    }
+
+    const session = getAdminSession();
+    if (!session) {
+      window.location.href = "/login";
+      return;
+    }
+
+    const accessToken = session.accessToken;
+    let isCancelled = false;
+
+    async function loadBackendData() {
+      try {
+        const [backendLeads, backendStudents] = await Promise.all([
+          listLeads(accessToken),
+          listStudents(accessToken),
+        ]);
+
+        if (isCancelled) return;
+        setLeads(backendLeads);
+        setStudents(backendStudents);
+        setSyncMessage("Connected to Supabase");
+      } catch (error) {
+        console.error(error);
+        if (!isCancelled) {
+          setSyncMessage("Could not load Supabase data. Check the database schema and policies.");
+        }
+      }
+    }
+
+    loadBackendData();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+
+  function getAccessToken() {
+    return getAdminSession()?.accessToken ?? null;
+  }
 
   const filteredLeads = useMemo(() => {
     const query = leadSearch.trim().toLowerCase();
@@ -258,7 +190,9 @@ export function AdminPanel() {
     () => ({
       total: students.length,
       active: students.filter((student) => student.status === "Active").length,
-      avgProgress: Math.round(students.reduce((sum, student) => sum + student.progress, 0) / students.length),
+      avgProgress: students.length
+        ? Math.round(students.reduce((sum, student) => sum + student.progress, 0) / students.length)
+        : 0,
     }),
     [students],
   );
@@ -273,34 +207,123 @@ export function AdminPanel() {
     setStudentDraft({ ...emptyStudent, id: `ST-${String(students.length + 1).padStart(3, "0")}` });
   }
 
-  function saveLead() {
+  async function saveLead() {
     if (!leadDraft) return;
-    if (leadMode === "add") {
-      setLeads((current) => [leadDraft, ...current]);
-    } else {
-      setLeads((current) => current.map((lead) => (lead.id === leadDraft.id ? leadDraft : lead)));
+    const draft = leadDraft;
+
+    if (!isSupabaseConfigured()) {
+      setSyncMessage("Supabase is not configured, so lead changes cannot be saved");
+      return;
     }
-    setLeadDraft(null);
+
+    const accessToken = getAccessToken();
+    if (!accessToken) {
+      window.location.href = "/login";
+      return;
+    }
+
+    try {
+      const savedLead = await saveLeadToSupabase(draft, accessToken, leadMode);
+      if (leadMode === "add") {
+        setLeads((current) => [savedLead, ...current]);
+      } else {
+        setLeads((current) => current.map((lead) => (lead.id === savedLead.id ? savedLead : lead)));
+      }
+      setSyncMessage("Lead saved to Supabase");
+      setLeadDraft(null);
+    } catch (error) {
+      console.error(error);
+      setSyncMessage("Could not save lead to Supabase");
+    }
   }
 
-  function saveStudent() {
+  async function saveStudent() {
     if (!studentDraft) return;
-    if (studentMode === "add") {
-      setStudents((current) => [studentDraft, ...current]);
-    } else {
-      setStudents((current) => current.map((student) => (student.id === studentDraft.id ? studentDraft : student)));
+    const draft = studentDraft;
+
+    if (!isSupabaseConfigured()) {
+      setSyncMessage("Supabase is not configured, so student changes cannot be saved");
+      return;
     }
-    setStudentDraft(null);
+
+    const accessToken = getAccessToken();
+    if (!accessToken) {
+      window.location.href = "/login";
+      return;
+    }
+
+    try {
+      const savedStudent = await saveStudentToSupabase(draft, accessToken, studentMode);
+      if (studentMode === "add") {
+        setStudents((current) => [savedStudent, ...current]);
+      } else {
+        setStudents((current) => current.map((student) => (student.id === savedStudent.id ? savedStudent : student)));
+      }
+      setSyncMessage("Student saved to Supabase");
+      setStudentDraft(null);
+    } catch (error) {
+      console.error(error);
+      setSyncMessage("Could not save student to Supabase");
+    }
   }
 
-  function deleteLead(id: string) {
+  async function deleteLead(id: string) {
+    if (!isSupabaseConfigured()) {
+      setSyncMessage("Supabase is not configured, so lead changes cannot be saved");
+      return;
+    }
+
+    const accessToken = getAccessToken();
+    if (!accessToken) {
+      window.location.href = "/login";
+      return;
+    }
+
+    try {
+      await deleteLeadFromSupabase(id, accessToken);
+      setSyncMessage("Lead deleted from Supabase");
+    } catch (error) {
+      console.error(error);
+      setSyncMessage("Could not delete lead from Supabase");
+      return;
+    }
+
     setLeads((current) => current.filter((lead) => lead.id !== id));
     setLeadDraft(null);
   }
 
-  function deleteStudent(id: string) {
+  async function deleteStudent(id: string) {
+    if (!isSupabaseConfigured()) {
+      setSyncMessage("Supabase is not configured, so student changes cannot be saved");
+      return;
+    }
+
+    const accessToken = getAccessToken();
+    if (!accessToken) {
+      window.location.href = "/login";
+      return;
+    }
+
+    try {
+      await deleteStudentFromSupabase(id, accessToken);
+      setSyncMessage("Student deleted from Supabase");
+    } catch (error) {
+      console.error(error);
+      setSyncMessage("Could not delete student from Supabase");
+      return;
+    }
+
     setStudents((current) => current.filter((student) => student.id !== id));
     setStudentDraft(null);
+  }
+
+  function handleLogout() {
+    clearAdminSession();
+    window.location.href = "/login";
+  }
+
+  if (!isSupabaseConfigured()) {
+    return <AdminConfigRequired />;
   }
 
   return (
@@ -325,13 +348,14 @@ export function AdminPanel() {
             </div>
             <div className="flex items-center gap-2 lg:hidden">
               <ThemeToggle scope="admin" />
-              <Link
-                href="/login"
+              <button
+                type="button"
+                onClick={handleLogout}
                 className="grid size-10 place-items-center rounded-md border border-white/10 text-white/70 transition hover:bg-white/10 hover:text-white"
                 aria-label="Log out"
               >
                 <LogOut size={18} aria-hidden />
-              </Link>
+              </button>
             </div>
           </div>
 
@@ -362,13 +386,14 @@ export function AdminPanel() {
             <ThemeToggle scope="admin" />
           </div>
 
-          <Link
-            href="/login"
+          <button
+            type="button"
+            onClick={handleLogout}
             className="mt-3 hidden w-full items-center justify-center gap-2 rounded-md border border-white/10 px-4 py-2.5 text-sm font-extrabold text-white/64 transition hover:bg-white/10 hover:text-white lg:inline-flex"
           >
             <LogOut size={17} aria-hidden />
             Exit Admin
-          </Link>
+          </button>
         </aside>
 
         <section className="min-w-0">
@@ -379,6 +404,7 @@ export function AdminPanel() {
                 <h1 className="mt-1 font-heading text-[2rem] font-normal leading-tight sm:text-4xl md:text-3xl xl:text-4xl">
                   {activeView === "dashboard" ? "Dashboard" : activeView === "leads" ? "Leads" : "Students"}
                 </h1>
+                {syncMessage && <p className="mt-1 text-xs font-bold text-brand-navy/46">{syncMessage}</p>}
               </div>
               <div className="grid gap-2 sm:grid-cols-2 md:w-auto">
                 <button type="button" onClick={openNewLead} className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-brand-red px-4 text-sm font-extrabold text-white transition hover:bg-brand-red-dark sm:h-11">
@@ -471,14 +497,68 @@ export function AdminPanel() {
   );
 }
 
+function AdminConfigRequired() {
+  return (
+    <main className="grid min-h-screen place-items-center bg-brand-navy px-4 py-8 text-white">
+      <section className="w-full max-w-xl rounded-xl border border-white/10 bg-white/[0.04] p-6 shadow-2xl shadow-black/24 sm:p-8">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span className="relative size-11 overflow-hidden rounded-md border border-white/10 bg-brand-blue">
+              <Image
+                src="/images/alberto-avatar.png"
+                alt="Alberto Sosa"
+                fill
+                sizes="44px"
+                className="object-cover"
+              />
+            </span>
+            <div>
+              <p className="font-heading text-2xl font-semibold">Alberto Academy</p>
+              <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-brand-teal-light">Admin Setup</p>
+            </div>
+          </div>
+          <ThemeToggle scope="admin" compact />
+        </div>
+        <h1 className="mt-8 font-heading text-3xl font-normal leading-tight sm:text-4xl">
+          Supabase needs to be configured first.
+        </h1>
+        <p className="mt-4 text-sm font-semibold leading-6 text-white/62">
+          Add the public Supabase URL and anon key to the project environment variables, then restart or redeploy the app.
+        </p>
+      </section>
+    </main>
+  );
+}
+
 export function AdminLogin({ onEnter }: { onEnter?: () => void }) {
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  const [email, setEmail] = useState("alberto@albertoacademy.com");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (onEnter) {
       onEnter();
       return;
     }
-    window.location.href = "/admin";
+
+    if (!isSupabaseConfigured()) {
+      setErrorMessage("Supabase environment variables are not configured.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrorMessage(null);
+
+    try {
+      await signInAdmin(email, password);
+      window.location.href = "/admin";
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Could not sign in.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -508,22 +588,40 @@ export function AdminLogin({ onEnter }: { onEnter?: () => void }) {
         <div className="mt-6 grid gap-4 sm:mt-7">
           <label className="form-field">
             Email
-            <input type="email" defaultValue="alberto@albertoacademy.com" />
+            <input
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              required
+              autoComplete="email"
+            />
           </label>
           <label className="form-field">
             Password
-            <input type="password" defaultValue="admin-preview" />
+            <input
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+              autoComplete="current-password"
+            />
           </label>
         </div>
 
-        <button type="submit" className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-brand-red px-6 text-sm font-extrabold text-white transition hover:bg-brand-red-dark sm:mt-7">
-          Enter Admin
+        {errorMessage && (
+          <p className="mt-4 rounded-md border border-brand-red/20 bg-brand-red/8 px-4 py-3 text-sm font-bold text-brand-red">
+            {errorMessage}
+          </p>
+        )}
+
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-brand-red px-6 text-sm font-extrabold text-white transition hover:bg-brand-red-dark disabled:cursor-not-allowed disabled:opacity-60 sm:mt-7"
+        >
+          {isSubmitting ? "Signing in..." : "Enter Admin"}
           <ChevronRight size={18} aria-hidden />
         </button>
-
-        <p className="mt-5 text-center text-xs font-semibold uppercase tracking-[0.08em] text-brand-navy/42">
-          No authentication yet
-        </p>
       </form>
     </main>
   );
@@ -565,7 +663,7 @@ function Dashboard({
           <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
             {leadStatuses.map((status) => {
               const count = leads.filter((lead) => lead.status === status).length;
-              const percent = Math.max(8, Math.round((count / leads.length) * 100));
+              const percent = leads.length ? Math.max(8, Math.round((count / leads.length) * 100)) : 0;
 
               return (
                 <div key={status} className="rounded-lg border border-brand-navy/8 bg-surface-cream p-3 transition hover:border-brand-teal/30 hover:bg-surface-white sm:p-3.5">
@@ -693,6 +791,10 @@ function LeadsView({
                 <span className="text-right text-brand-navy/78">{lead.interest}</span>
               </div>
               <div className="flex items-center justify-between gap-3">
+                <span>Phone</span>
+                <span className="text-right text-brand-navy/78">{lead.phone || "Not provided"}</span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
                 <span>Level</span>
                 <span className="text-right text-brand-navy/78">{lead.level}</span>
               </div>
@@ -705,10 +807,11 @@ function LeadsView({
         ))}
       </div>
       <div className="hidden overflow-x-auto md:block">
-        <table className="w-full min-w-[54rem] border-t border-brand-navy/10 text-left">
+        <table className="w-full min-w-[64rem] border-t border-brand-navy/10 text-left">
           <thead className="bg-brand-navy text-xs font-extrabold uppercase tracking-[0.08em] text-white/62">
             <tr>
               <th className="px-4 py-3 lg:px-5">Lead</th>
+              <th className="px-4 py-3 lg:px-5">Phone</th>
               <th className="px-4 py-3 lg:px-5">Interest</th>
               <th className="px-4 py-3 lg:px-5">Level</th>
               <th className="px-4 py-3 lg:px-5">Status</th>
@@ -726,6 +829,7 @@ function LeadsView({
                     <span className="mt-1 block text-xs font-semibold text-brand-navy/48">{lead.email}</span>
                   </div>
                 </td>
+                <td className="px-4 py-3.5 text-sm font-semibold text-brand-navy/58 lg:px-5">{lead.phone || "Not provided"}</td>
                 <td className="px-4 py-3.5 text-sm font-semibold text-brand-navy/66 lg:px-5">{lead.interest}</td>
                 <td className="px-4 py-3.5 text-sm font-bold text-brand-navy/62 lg:px-5">{lead.level}</td>
                 <td className="px-4 py-3.5 lg:px-5">
@@ -807,9 +911,15 @@ function StudentsView({
               <StatusPill status={student.status} />
             </div>
             <div className="mt-3 border-t border-brand-navy/8 pt-3">
-              <div className="mb-2 flex items-center justify-between gap-3 text-xs font-bold text-brand-navy/58">
-                <span>{student.program}</span>
-                <span>{student.level}</span>
+              <div className="grid gap-2 text-xs font-bold text-brand-navy/58">
+                <div className="flex items-center justify-between gap-3">
+                  <span>Phone</span>
+                  <span className="text-right text-brand-navy/78">{student.phone || "Not provided"}</span>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <span>{student.program}</span>
+                  <span>{student.level}</span>
+                </div>
               </div>
               <ProgressBar value={student.progress} />
             </div>
@@ -817,10 +927,11 @@ function StudentsView({
         ))}
       </div>
       <div className="hidden overflow-x-auto md:block">
-        <table className="w-full min-w-[58rem] border-t border-brand-navy/10 text-left">
+        <table className="w-full min-w-[68rem] border-t border-brand-navy/10 text-left">
           <thead className="bg-brand-navy text-xs font-extrabold uppercase tracking-[0.08em] text-white/62">
             <tr>
               <th className="px-4 py-3 lg:px-5">Student</th>
+              <th className="px-4 py-3 lg:px-5">Phone</th>
               <th className="px-4 py-3 lg:px-5">Program</th>
               <th className="px-4 py-3 lg:px-5">Level</th>
               <th className="px-4 py-3 lg:px-5">Status</th>
@@ -838,6 +949,7 @@ function StudentsView({
                     <span className="mt-1 block text-xs font-semibold text-brand-navy/48">{student.email}</span>
                   </div>
                 </td>
+                <td className="px-4 py-3.5 text-sm font-semibold text-brand-navy/58 lg:px-5">{student.phone || "Not provided"}</td>
                 <td className="px-4 py-3.5 text-sm font-semibold text-brand-navy/66 lg:px-5">{student.program}</td>
                 <td className="px-4 py-3.5 text-sm font-bold text-brand-navy/62 lg:px-5">{student.level}</td>
                 <td className="px-4 py-3.5 lg:px-5">
@@ -1012,6 +1124,8 @@ function StudentSheet({
         <StudentSelect label="Program" value={student.program} options={programs} onChange={(value) => setStudent({ ...student, program: value })} />
         <StudentSelect label="Level" value={student.level} options={studentLevels} onChange={(value) => setStudent({ ...student, level: value as Student["level"] })} />
         <StudentSelect label="Status" value={student.status} options={studentStatuses} onChange={(value) => setStudent({ ...student, status: value as StudentStatus })} />
+        <StudentField label="Progress %" type="number" value={String(student.progress)} onChange={(value) => setStudent({ ...student, progress: clampProgress(value) })} />
+        <StudentField label="Next session" type="date" value={student.nextSession} onChange={(value) => setStudent({ ...student, nextSession: value })} />
         <div className="sm:col-span-2">
           <StudentTextarea label="Goals" value={student.goals} onChange={(value) => setStudent({ ...student, goals: value })} />
         </div>

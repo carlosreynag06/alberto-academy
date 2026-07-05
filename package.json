@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "supabase:install": "powershell -ExecutionPolicy Bypass -File scripts/install-supabase-cli.ps1",
+    "supabase": ".\\tools\\supabase\\supabase.exe",
+    "db:link": ".\\tools\\supabase\\supabase.exe link --project-ref rryggmugbpxweqqiceqo",
+    "db:push": ".\\tools\\supabase\\supabase.exe db push",
+    "db:reset": ".\\tools\\supabase\\supabase.exe db reset"
   },
   "dependencies": {
     "lucide-react": "^1.21.0",

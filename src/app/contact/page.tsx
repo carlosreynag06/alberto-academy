@@ -1,7 +1,7 @@
 import Image from "next/image";
+import { ContactForm } from "@/components/contact-form";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import {
-  ArrowRight,
   CalendarCheck,
   CheckCircle2,
   Clock3,
@@ -98,38 +98,7 @@ export default function ContactPage() {
             </div>
           </div>
 
-          <form className="bg-brand-navy px-6 py-10 text-white sm:px-10 sm:py-12 lg:px-20 lg:py-16" action="#" aria-label="Trial session booking form">
-            <div className="mx-auto flex h-full max-w-2xl flex-col justify-center gap-8 sm:gap-10 lg:gap-12">
-              <label className="contact-line-field">
-                Full name
-                <input type="text" name="name" />
-              </label>
-
-              <label className="contact-line-field">
-                Email address
-                <input type="email" name="email" />
-              </label>
-
-              <label className="contact-line-field">
-                Current level
-                <select name="level" defaultValue="">
-                  <option value="" disabled />
-                  <option>Beginner</option>
-                  <option>Intermediate</option>
-                  <option>Advanced</option>
-                  <option>Not sure yet</option>
-                </select>
-              </label>
-
-              <button
-                type="submit"
-                className="group flex items-center justify-between border-b border-white/28 pb-6 text-left font-heading text-2xl font-normal text-white transition hover:border-white sm:pb-7 sm:text-3xl"
-              >
-                Submit Request
-                <ArrowRight className="shrink-0 transition group-hover:translate-x-1" size={30} aria-hidden />
-              </button>
-            </div>
-          </form>
+          <ContactForm />
         </div>
       </section>
 
