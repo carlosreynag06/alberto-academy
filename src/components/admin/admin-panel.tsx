@@ -20,28 +20,46 @@ import {
   signInAdmin,
 } from "@/lib/supabase-rest";
 import {
+  ArrowLeft,
+  Award,
   BarChart3,
   BookOpenCheck,
   CalendarCheck,
+  CalendarDays,
+  CheckCircle2,
   ChevronRight,
   ClipboardList,
+  FileText,
   LayoutDashboard,
   LogOut,
+  Mail,
   MessageSquareText,
+  Monitor,
   Pencil,
+  Phone,
   Plus,
   Save,
   Search,
   Settings,
+  Target,
   Trash2,
   UploadCloud,
   UserCheck,
   UserRoundPlus,
   Users,
+  Video,
   X,
 } from "lucide-react";
 
-type ActiveView = "dashboard" | "leads" | "students" | "questionnaire" | "courses" | "materials" | "settings";
+type ActiveView =
+  | "dashboard"
+  | "leads"
+  | "students"
+  | "student-detail"
+  | "questionnaire"
+  | "courses"
+  | "materials"
+  | "settings";
 
 const navItems: { label: string; view: ActiveView; icon: typeof LayoutDashboard; enabled: boolean }[] = [
   { label: "Dashboard", view: "dashboard", icon: LayoutDashboard, enabled: true },
@@ -106,8 +124,8 @@ export function AdminPanel() {
   const [studentProgramFilter, setStudentProgramFilter] = useState("All");
   const [leadDraft, setLeadDraft] = useState<Lead | null>(null);
   const [studentDraft, setStudentDraft] = useState<Student | null>(null);
+  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [questionnaireAnswers, setQuestionnaireAnswers] = useState<Record<number, string>>({});
-  const [questionnaireStatus, setQuestionnaireStatus] = useState<string | null>(null);
   const [leadMode, setLeadMode] = useState<"add" | "edit">("edit");
   const [studentMode, setStudentMode] = useState<"add" | "edit">("edit");
   const [syncMessage, setSyncMessage] = useState<string | null>(() =>
@@ -146,9 +164,6 @@ export function AdminPanel() {
           setQuestionnaireAnswers(backendQuestionnaireAnswers);
         } catch (error) {
           console.error(error);
-          if (!isCancelled) {
-            setQuestionnaireStatus("La tabla del cuestionario todavía no está disponible en Supabase");
-          }
         }
       } catch (error) {
         console.error(error);
@@ -215,6 +230,11 @@ export function AdminPanel() {
     [students],
   );
 
+  const selectedStudent = useMemo(
+    () => students.find((student) => student.id === selectedStudentId) ?? null,
+    [selectedStudentId, students],
+  );
+
   const questionnaireCompleted = useMemo(
     () => Object.values(questionnaireAnswers).filter((answer) => answer.trim().length > 0).length,
     [questionnaireAnswers],
@@ -227,9 +247,11 @@ export function AdminPanel() {
         ? "Leads"
         : activeView === "students"
           ? "Students"
-          : activeView === "questionnaire"
-            ? "Cuestionario"
-            : "Workspace";
+          : activeView === "student-detail"
+            ? selectedStudent?.name ?? "Student Profile"
+            : activeView === "questionnaire"
+              ? "Cuestionario"
+              : "Workspace";
 
   function openNewLead() {
     setLeadMode("add");
@@ -239,6 +261,22 @@ export function AdminPanel() {
   function openNewStudent() {
     setStudentMode("add");
     setStudentDraft({ ...emptyStudent, id: `ST-${String(students.length + 1).padStart(3, "0")}` });
+  }
+
+  function openStudentProfile(student: Student) {
+    setSelectedStudentId(student.id);
+    setActiveView("student-detail");
+  }
+
+  function returnToStudents() {
+    setActiveView("students");
+    setSelectedStudentId(null);
+  }
+
+  function editSelectedStudent() {
+    if (!selectedStudent) return;
+    setStudentMode("edit");
+    setStudentDraft(selectedStudent);
   }
 
   async function saveLead() {
@@ -349,11 +387,14 @@ export function AdminPanel() {
 
     setStudents((current) => current.filter((student) => student.id !== id));
     setStudentDraft(null);
+    if (selectedStudentId === id) {
+      returnToStudents();
+    }
   }
 
   async function saveQuestionnaire() {
     if (!isSupabaseConfigured()) {
-      setQuestionnaireStatus("Supabase no está configurado, las respuestas no se pueden guardar");
+      setSyncMessage("Supabase is not configured, so questionnaire answers cannot be saved");
       return;
     }
 
@@ -364,13 +405,10 @@ export function AdminPanel() {
     }
 
     try {
-      setQuestionnaireStatus("Guardando cuestionario...");
       await saveQuestionnaireAnswers(questionnaireAnswers, accessToken);
-      setQuestionnaireStatus("Guardado en Supabase");
       setSyncMessage("Questionnaire saved to Supabase");
     } catch (error) {
       console.error(error);
-      setQuestionnaireStatus("No se pudieron guardar las respuestas");
       setSyncMessage("Could not save questionnaire answers");
     }
   }
@@ -420,13 +458,19 @@ export function AdminPanel() {
           <nav className="mt-5 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] lg:mt-7 lg:grid lg:gap-1.5 lg:overflow-visible lg:pb-0" aria-label="Admin navigation">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = activeView === item.view;
+              const isActive = activeView === item.view || (activeView === "student-detail" && item.view === "students");
 
               return (
                 <button
                   key={item.label}
                   type="button"
-                  onClick={() => item.enabled && setActiveView(item.view)}
+                  onClick={() => {
+                    if (!item.enabled) return;
+                    if (item.view !== "students") {
+                      setSelectedStudentId(null);
+                    }
+                    setActiveView(item.view);
+                  }}
                   className={`flex min-w-fit items-center gap-2.5 rounded-md px-3 py-2.5 text-left text-sm font-extrabold transition lg:w-full lg:px-2.5 ${
                     isActive
                       ? "bg-brand-teal text-white shadow-lg shadow-brand-teal/18"
@@ -474,6 +518,17 @@ export function AdminPanel() {
                     Guardar respuestas
                   </button>
                 </div>
+              ) : activeView === "student-detail" && selectedStudent ? (
+                <div className="grid gap-2 sm:grid-cols-2 md:w-auto">
+                  <button type="button" onClick={returnToStudents} className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-brand-navy/12 bg-surface-cream px-4 text-sm font-extrabold text-brand-navy transition hover:border-brand-teal hover:bg-surface-white sm:h-11">
+                    <ArrowLeft size={17} aria-hidden />
+                    Students
+                  </button>
+                  <button type="button" onClick={editSelectedStudent} className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-brand-red px-4 text-sm font-extrabold text-white transition hover:bg-brand-red-dark sm:h-11">
+                    <Pencil size={17} aria-hidden />
+                    Edit Profile
+                  </button>
+                </div>
               ) : (
                 <div className="grid gap-2 sm:grid-cols-2 md:w-auto">
                   <button type="button" onClick={openNewLead} className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-brand-red px-4 text-sm font-extrabold text-white transition hover:bg-brand-red-dark sm:h-11">
@@ -501,8 +556,7 @@ export function AdminPanel() {
                   setLeadDraft(lead);
                 }}
                 openStudent={(student) => {
-                  setStudentMode("edit");
-                  setStudentDraft(student);
+                  openStudentProfile(student);
                 }}
               />
             )}
@@ -533,9 +587,16 @@ export function AdminPanel() {
                 setProgramFilter={setStudentProgramFilter}
                 onAdd={openNewStudent}
                 onOpen={(student) => {
-                  setStudentMode("edit");
-                  setStudentDraft(student);
+                  openStudentProfile(student);
                 }}
+              />
+            )}
+
+            {activeView === "student-detail" && selectedStudent && (
+              <StudentProfilePage
+                student={selectedStudent}
+                onBack={returnToStudents}
+                onEdit={editSelectedStudent}
               />
             )}
 
@@ -543,7 +604,6 @@ export function AdminPanel() {
               <QuestionnaireView
                 answers={questionnaireAnswers}
                 completed={questionnaireCompleted}
-                status={questionnaireStatus}
                 onAnswerChange={(questionId, answer) =>
                   setQuestionnaireAnswers((current) => ({ ...current, [questionId]: answer }))
                 }
@@ -821,13 +881,11 @@ function Dashboard({
 function QuestionnaireView({
   answers,
   completed,
-  status,
   onAnswerChange,
   onSave,
 }: {
   answers: Record<number, string>;
   completed: number;
-  status: string | null;
   onAnswerChange: (questionId: number, answer: string) => void;
   onSave: () => void;
 }) {
@@ -907,13 +965,8 @@ function QuestionnaireView({
                 Información real para escribir una web que sí represente el negocio.
               </h2>
             </div>
-            <div className="grid gap-2 sm:grid-cols-[auto_auto]">
-              {status && (
-                <p className="inline-flex min-h-11 items-center justify-center rounded-md border border-brand-navy/10 bg-surface-cream px-4 text-sm font-extrabold text-brand-navy/58">
-                  {status}
-                </p>
-              )}
-              <button type="button" onClick={onSave} className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-brand-red px-5 text-sm font-extrabold text-white transition hover:bg-brand-red-dark">
+            <div className="flex sm:justify-end">
+              <button type="button" onClick={onSave} className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-brand-red px-5 text-sm font-extrabold text-white transition hover:bg-brand-red-dark sm:w-auto sm:min-w-52">
                 <Save size={17} aria-hidden />
                 Guardar respuestas
               </button>
@@ -970,6 +1023,357 @@ function QuestionnaireView({
         })}
       </section>
     </div>
+  );
+}
+
+function StudentProfilePage({
+  student,
+  onBack,
+  onEdit,
+}: {
+  student: Student;
+  onBack: () => void;
+  onEdit: () => void;
+}) {
+  const initials = student.name.replace(/[^a-zA-ZÀ-ÿ]/g, "").slice(0, 2).toUpperCase() || "ST";
+  const attendance = student.status === "Paused" ? 71 : student.status === "Completed" ? 100 : 88;
+  const nextSession = student.nextSession || "2026-07-08";
+  const deliveryMode = student.program.includes("Conversation") ? "Online private coaching" : "Hybrid private track";
+
+  const learningPlan = [
+    { title: "Placement review", detail: "Level, goals, and speaking baseline", done: true },
+    { title: "Guided speaking lab", detail: "Real-time correction and fluency drills", done: student.progress >= 25 },
+    { title: "Applied grammar sprint", detail: "Grammar patterns used in real situations", done: student.progress >= 45 },
+    { title: "Confidence presentation", detail: "Final spoken task with feedback notes", done: student.progress >= 75 },
+  ];
+
+  const homework = [
+    { title: "Record a two-minute speaking reflection", due: "Due Thursday", status: "Assigned" },
+    { title: "Vocabulary set: meetings and introductions", due: "Due Friday", status: "In progress" },
+    { title: "Short writing correction draft", due: "Reviewed last class", status: "Returned" },
+  ];
+
+  const recentNotes = [
+    "Student speaks more freely when prompts are connected to work situations.",
+    "Needs more practice with past tense accuracy while speaking under pressure.",
+    "Next class should include a 10-minute pronunciation warmup and role-play.",
+  ];
+
+  return (
+    <div className="grid gap-4 lg:gap-5">
+      <section className="overflow-hidden rounded-xl bg-brand-navy text-white shadow-xl shadow-brand-navy/12">
+        <div className="grid gap-0 xl:grid-cols-[1.08fr_0.92fr]">
+          <div className="p-4 sm:p-6">
+            <button
+              type="button"
+              onClick={onBack}
+              className="mb-5 inline-flex h-9 items-center gap-2 rounded-md border border-white/12 px-3 text-xs font-extrabold text-white/70 transition hover:bg-white/10 hover:text-white"
+            >
+              <ArrowLeft size={16} aria-hidden />
+              Back to students
+            </button>
+
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex items-start gap-4">
+                <div className="grid size-16 shrink-0 place-items-center rounded-xl bg-brand-teal text-2xl font-heading text-white shadow-lg shadow-brand-teal/18 sm:size-20 sm:text-3xl">
+                  {initials}
+                </div>
+                <div className="min-w-0">
+                  <p className="section-kicker-dark">Student workspace</p>
+                  <h2 className="mt-1 font-heading text-3xl font-normal leading-tight sm:text-5xl">{student.name}</h2>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <StatusPill status={student.status} />
+                    <span className="rounded-full border border-white/12 bg-white/[0.06] px-3 py-1 text-xs font-extrabold text-white/64">
+                      {student.program}
+                    </span>
+                    <span className="rounded-full border border-brand-teal-light/20 bg-brand-teal/18 px-3 py-1 text-xs font-extrabold text-brand-teal-light">
+                      {deliveryMode}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={onEdit}
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-brand-red px-4 text-sm font-extrabold text-white transition hover:bg-brand-red-dark sm:min-w-36"
+              >
+                <Pencil size={17} aria-hidden />
+                Edit profile
+              </button>
+            </div>
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              <StudentActionButton icon={Video} label="Start video call" tone="red" />
+              <StudentActionButton icon={FileText} label="Assign homework" />
+              <StudentActionButton icon={CalendarCheck} label="Track attendance" />
+            </div>
+          </div>
+
+          <div className="border-t border-white/10 bg-white/[0.04] p-4 sm:p-6 xl:border-l xl:border-t-0">
+            <p className="section-kicker-dark">Next live lesson</p>
+            <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.06] p-4">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="font-heading text-3xl font-normal">{nextSession}</p>
+                  <p className="mt-2 text-sm font-semibold text-white/58">60-minute {student.level.toLowerCase()} session</p>
+                </div>
+                <span className="grid size-11 place-items-center rounded-lg bg-brand-blue text-white">
+                  <Monitor size={21} aria-hidden />
+                </span>
+              </div>
+              <div className="mt-4 grid gap-2 text-sm font-semibold text-white/64">
+                <p>Class type: {deliveryMode}</p>
+                <p>Focus: speaking confidence, correction, and practical vocabulary</p>
+              </div>
+            </div>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <StudentMiniStat label="Attendance" value={`${attendance}%`} />
+              <StudentMiniStat label="Active tasks" value="3" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="grid gap-4 xl:grid-cols-[0.78fr_1.22fr] xl:gap-5">
+        <section className="grid gap-4">
+          <div className="rounded-xl border border-brand-navy/10 bg-surface-white p-4 shadow-xl shadow-brand-navy/6 sm:p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="section-kicker">Student Info</p>
+                <h3 className="mt-1 font-heading text-2xl font-normal leading-tight">Profile block</h3>
+              </div>
+              <UserCheck className="text-brand-teal" size={26} aria-hidden />
+            </div>
+            <div className="mt-4 grid gap-3">
+              <StudentInfoRow icon={UserCheck} label="Full name" value={student.name} />
+              <StudentInfoRow icon={Mail} label="Email address" value={student.email} href={`mailto:${student.email}`} />
+              <StudentInfoRow icon={Phone} label="Phone number" value={student.phone || "Not provided"} href={student.phone ? `tel:${student.phone}` : undefined} />
+              <StudentInfoRow icon={Award} label="Current level" value={student.level} />
+              <StudentInfoRow icon={BookOpenCheck} label="Program" value={student.program} />
+            </div>
+          </div>
+
+          <div className="rounded-xl bg-brand-blue p-4 text-white shadow-xl shadow-brand-navy/10 sm:p-5">
+            <p className="section-kicker-dark">Learning Notes</p>
+            <h3 className="mt-1 font-heading text-2xl font-normal">Teacher briefing</h3>
+            <div className="mt-4 grid gap-3">
+              {recentNotes.map((note) => (
+                <div key={note} className="rounded-lg border border-white/10 bg-white/[0.07] p-3 text-sm font-semibold leading-6 text-white/70">
+                  {note}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="grid gap-4">
+          <div className="grid gap-3 sm:grid-cols-3">
+            <StudentKpiCard label="Course progress" value={`${student.progress}%`} icon={BarChart3} />
+            <StudentKpiCard label="Attendance" value={`${attendance}%`} icon={CheckCircle2} tone="blue" />
+            <StudentKpiCard label="Sessions" value="12" icon={CalendarDays} tone="teal" />
+          </div>
+
+          <div className="rounded-xl border border-brand-navy/10 bg-surface-white p-4 shadow-xl shadow-brand-navy/6 sm:p-5">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <p className="section-kicker">Progress</p>
+                <h3 className="mt-1 font-heading text-2xl font-normal leading-tight">Learning path</h3>
+              </div>
+              <button type="button" className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-brand-navy px-4 text-sm font-extrabold text-white transition hover:bg-brand-blue">
+                <Target size={17} aria-hidden />
+                Update goals
+              </button>
+            </div>
+            <div className="mt-5">
+              <ProgressBar value={student.progress} />
+            </div>
+            <div className="mt-5 grid gap-3">
+              {learningPlan.map((item) => (
+                <div key={item.title} className="grid gap-3 rounded-lg border border-brand-navy/10 bg-surface-cream p-3.5 sm:grid-cols-[auto_1fr_auto] sm:items-center">
+                  <span className={`grid size-10 place-items-center rounded-lg ${item.done ? "bg-brand-teal text-white" : "bg-brand-navy/8 text-brand-navy/46"}`}>
+                    <CheckCircle2 size={19} aria-hidden />
+                  </span>
+                  <div>
+                    <p className="font-extrabold text-brand-navy">{item.title}</p>
+                    <p className="mt-1 text-sm font-semibold text-brand-navy/54">{item.detail}</p>
+                  </div>
+                  <span className="w-fit rounded-full border border-brand-navy/10 bg-surface-white px-3 py-1 text-xs font-extrabold text-brand-navy/56">
+                    {item.done ? "Complete" : "Upcoming"}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-2">
+            <div className="rounded-xl border border-brand-navy/10 bg-surface-white p-4 shadow-xl shadow-brand-navy/6 sm:p-5">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="section-kicker">Homework</p>
+                  <h3 className="mt-1 font-heading text-2xl font-normal">Assignments</h3>
+                </div>
+                <FileText className="text-brand-blue" size={26} aria-hidden />
+              </div>
+              <div className="mt-4 grid gap-3">
+                {homework.map((task) => (
+                  <div key={task.title} className="rounded-lg border border-brand-navy/10 bg-surface-cream p-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="font-extrabold leading-5 text-brand-navy">{task.title}</p>
+                      <span className="shrink-0 rounded-full bg-brand-teal/14 px-2.5 py-1 text-[0.68rem] font-extrabold text-brand-blue">
+                        {task.status}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-xs font-bold text-brand-navy/48">{task.due}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-brand-navy/10 bg-surface-white p-4 shadow-xl shadow-brand-navy/6 sm:p-5">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="section-kicker">Classroom</p>
+                  <h3 className="mt-1 font-heading text-2xl font-normal">Operations</h3>
+                </div>
+                <CalendarDays className="text-brand-teal" size={26} aria-hidden />
+              </div>
+              <div className="mt-4 grid gap-3">
+                <StudentOperationButton icon={Video} label="Open lesson room" meta="Zoom / Meet ready" />
+                <StudentOperationButton icon={CalendarDays} label="Schedule next session" meta="Private or group class" />
+                <StudentOperationButton icon={CheckCircle2} label="Mark attendance" meta="Present, late, absent" />
+                <StudentOperationButton icon={MessageSquareText} label="Send lesson recap" meta="Summary and next steps" />
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function StudentActionButton({
+  icon: Icon,
+  label,
+  tone = "navy",
+}: {
+  icon: typeof LayoutDashboard;
+  label: string;
+  tone?: "red" | "navy";
+}) {
+  return (
+    <button
+      type="button"
+      className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-md px-4 text-sm font-extrabold text-white transition ${
+        tone === "red" ? "bg-brand-red hover:bg-brand-red-dark" : "bg-white/[0.08] hover:bg-white/[0.13]"
+      }`}
+    >
+      <Icon size={18} aria-hidden />
+      {label}
+    </button>
+  );
+}
+
+function StudentMiniStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-white/10 bg-white/[0.06] p-3">
+      <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-white/44">{label}</p>
+      <p className="mt-2 font-heading text-3xl font-normal text-brand-teal-light">{value}</p>
+    </div>
+  );
+}
+
+function StudentInfoRow({
+  icon: Icon,
+  label,
+  value,
+  href,
+}: {
+  icon: typeof LayoutDashboard;
+  label: string;
+  value: string;
+  href?: string;
+}) {
+  const content = (
+    <>
+      <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-brand-blue text-white">
+        <Icon size={18} aria-hidden />
+      </span>
+      <span className="min-w-0">
+        <span className="block text-[0.68rem] font-extrabold uppercase tracking-[0.08em] text-brand-navy/42">{label}</span>
+        <span className="mt-1 block break-words text-sm font-extrabold text-brand-navy">{value}</span>
+      </span>
+    </>
+  );
+
+  if (href) {
+    return (
+      <a href={href} className="flex items-center gap-3 rounded-lg border border-brand-navy/10 bg-surface-cream p-3 transition hover:border-brand-teal/40 hover:bg-surface-white">
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-3 rounded-lg border border-brand-navy/10 bg-surface-cream p-3">
+      {content}
+    </div>
+  );
+}
+
+function StudentKpiCard({
+  label,
+  value,
+  icon: Icon,
+  tone = "navy",
+}: {
+  label: string;
+  value: string;
+  icon: typeof LayoutDashboard;
+  tone?: "navy" | "blue" | "teal";
+}) {
+  const toneClass = tone === "teal" ? "bg-brand-teal" : tone === "blue" ? "bg-brand-blue" : "bg-brand-navy";
+
+  return (
+    <article className={`${toneClass} rounded-xl p-4 text-white shadow-xl shadow-brand-navy/10`}>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-white/60">{label}</p>
+          <p className="mt-4 font-heading text-4xl font-normal leading-none">{value}</p>
+        </div>
+        <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-white/14">
+          <Icon size={21} aria-hidden />
+        </span>
+      </div>
+    </article>
+  );
+}
+
+function StudentOperationButton({
+  icon: Icon,
+  label,
+  meta,
+}: {
+  icon: typeof LayoutDashboard;
+  label: string;
+  meta: string;
+}) {
+  return (
+    <button
+      type="button"
+      className="flex items-center justify-between gap-3 rounded-lg border border-brand-navy/10 bg-surface-cream p-3 text-left transition hover:border-brand-teal/40 hover:bg-surface-white"
+    >
+      <span className="flex min-w-0 items-center gap-3">
+        <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-brand-teal text-white">
+          <Icon size={18} aria-hidden />
+        </span>
+        <span className="min-w-0">
+          <span className="block truncate text-sm font-extrabold text-brand-navy">{label}</span>
+          <span className="mt-1 block truncate text-xs font-bold text-brand-navy/46">{meta}</span>
+        </span>
+      </span>
+      <ChevronRight size={18} className="shrink-0 text-brand-navy/34" aria-hidden />
+    </button>
   );
 }
 
@@ -1342,16 +1746,6 @@ function StudentSheet({
   onSave: () => void;
   onDelete: () => void;
 }) {
-  const [isEditing, setIsEditing] = useState(mode === "add");
-
-  if (!isEditing) {
-    return (
-      <DetailShell title={student.name} subtitle={student.id} onClose={onClose} variant="drawer" density="compact">
-        <StudentDetailView student={student} onEdit={() => setIsEditing(true)} onDelete={onDelete} />
-      </DetailShell>
-    );
-  }
-
   return (
     <DetailShell title={mode === "add" ? "Add Student" : "Edit Student"} subtitle={student.id} onClose={onClose} variant="modal" density="compact">
       <div className="grid gap-3 sm:grid-cols-2">
@@ -1443,50 +1837,6 @@ function LeadDetailView({ lead, onEdit, onDelete }: { lead: Lead; onEdit: () => 
       <div className="rounded-xl border border-brand-navy/10 bg-surface-white p-4">
         <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-brand-navy/42">Notes</p>
         <p className="mt-3 text-sm leading-6 text-brand-navy/68">{lead.notes || "No notes yet."}</p>
-      </div>
-
-      <DetailActions onEdit={onEdit} onDelete={onDelete} />
-    </div>
-  );
-}
-
-function StudentDetailView({ student, onEdit, onDelete }: { student: Student; onEdit: () => void; onDelete: () => void }) {
-  return (
-    <div className="grid gap-4">
-      <div className="rounded-xl bg-brand-navy p-4 text-white">
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-brand-teal-light">Student Profile</p>
-            <h3 className="mt-2 truncate font-heading text-2xl font-normal sm:text-3xl">{student.name}</h3>
-            <p className="mt-2 text-sm font-semibold text-white/58">{student.program}</p>
-          </div>
-          <StatusPill status={student.status} />
-        </div>
-        <div className="mt-4 border-t border-white/10 pt-4">
-          <ProgressBar value={student.progress} dark />
-        </div>
-        <div className="mt-4 grid gap-2 border-t border-white/10 pt-4 text-sm font-semibold text-white/62">
-          <a href={`mailto:${student.email}`} className="break-words transition hover:text-white">{student.email}</a>
-          <a href={`tel:${student.phone}`} className="transition hover:text-white">{student.phone}</a>
-        </div>
-      </div>
-
-      <div className="grid gap-3 sm:grid-cols-2">
-        <DetailItem label="Level" value={student.level} />
-        <DetailItem label="Program" value={student.program} />
-        <DetailItem label="Progress" value={`${student.progress}%`} />
-        <DetailItem label="Status" value={student.status} />
-        <DetailItem label="Record ID" value={student.id} />
-        <DetailItem label="Next Session" value={student.nextSession} />
-      </div>
-
-      <div className="rounded-xl border border-brand-navy/10 bg-surface-white p-4">
-        <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-brand-navy/42">Goals</p>
-        <p className="mt-3 text-sm leading-6 text-brand-navy/68">{student.goals || "No goals added yet."}</p>
-      </div>
-      <div className="rounded-xl border border-brand-navy/10 bg-surface-white p-4">
-        <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-brand-navy/42">Notes</p>
-        <p className="mt-3 text-sm leading-6 text-brand-navy/68">{student.notes || "No notes yet."}</p>
       </div>
 
       <DetailActions onEdit={onEdit} onDelete={onDelete} />
