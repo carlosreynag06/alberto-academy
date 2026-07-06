@@ -4,6 +4,7 @@ import { type FormEvent, type ReactNode, useEffect, useMemo, useState } from "re
 import Image from "next/image";
 import { ThemeToggle } from "@/components/theme-toggle";
 import type { Lead, LeadStatus, Level, Student, StudentStatus } from "@/lib/crm-types";
+import { questionnaireQuestionCount, questionnaireSections } from "@/lib/questionnaire";
 import {
   clearAdminSession,
   deleteLeadFromSupabase,
@@ -11,7 +12,9 @@ import {
   getAdminSession,
   isSupabaseConfigured,
   listLeads,
+  listQuestionnaireAnswers,
   listStudents,
+  saveQuestionnaireAnswers,
   saveLeadToSupabase,
   saveStudentToSupabase,
   signInAdmin,
@@ -21,6 +24,7 @@ import {
   BookOpenCheck,
   CalendarCheck,
   ChevronRight,
+  ClipboardList,
   LayoutDashboard,
   LogOut,
   MessageSquareText,
@@ -37,12 +41,13 @@ import {
   X,
 } from "lucide-react";
 
-type ActiveView = "dashboard" | "leads" | "students" | "courses" | "materials" | "settings";
+type ActiveView = "dashboard" | "leads" | "students" | "questionnaire" | "courses" | "materials" | "settings";
 
 const navItems: { label: string; view: ActiveView; icon: typeof LayoutDashboard; enabled: boolean }[] = [
   { label: "Dashboard", view: "dashboard", icon: LayoutDashboard, enabled: true },
   { label: "Leads", view: "leads", icon: UserRoundPlus, enabled: true },
   { label: "Students", view: "students", icon: Users, enabled: true },
+  { label: "Cuestionario", view: "questionnaire", icon: ClipboardList, enabled: true },
   { label: "Courses", view: "courses", icon: BookOpenCheck, enabled: false },
   { label: "Materials", view: "materials", icon: UploadCloud, enabled: false },
   { label: "Settings", view: "settings", icon: Settings, enabled: false },
@@ -101,6 +106,8 @@ export function AdminPanel() {
   const [studentProgramFilter, setStudentProgramFilter] = useState("All");
   const [leadDraft, setLeadDraft] = useState<Lead | null>(null);
   const [studentDraft, setStudentDraft] = useState<Student | null>(null);
+  const [questionnaireAnswers, setQuestionnaireAnswers] = useState<Record<number, string>>({});
+  const [questionnaireStatus, setQuestionnaireStatus] = useState<string | null>(null);
   const [leadMode, setLeadMode] = useState<"add" | "edit">("edit");
   const [studentMode, setStudentMode] = useState<"add" | "edit">("edit");
   const [syncMessage, setSyncMessage] = useState<string | null>(() =>
@@ -132,6 +139,17 @@ export function AdminPanel() {
         setLeads(backendLeads);
         setStudents(backendStudents);
         setSyncMessage("Connected to Supabase");
+
+        try {
+          const backendQuestionnaireAnswers = await listQuestionnaireAnswers(accessToken);
+          if (isCancelled) return;
+          setQuestionnaireAnswers(backendQuestionnaireAnswers);
+        } catch (error) {
+          console.error(error);
+          if (!isCancelled) {
+            setQuestionnaireStatus("La tabla del cuestionario todavía no está disponible en Supabase");
+          }
+        }
       } catch (error) {
         console.error(error);
         if (!isCancelled) {
@@ -196,6 +214,22 @@ export function AdminPanel() {
     }),
     [students],
   );
+
+  const questionnaireCompleted = useMemo(
+    () => Object.values(questionnaireAnswers).filter((answer) => answer.trim().length > 0).length,
+    [questionnaireAnswers],
+  );
+
+  const activeViewTitle =
+    activeView === "dashboard"
+      ? "Dashboard"
+      : activeView === "leads"
+        ? "Leads"
+        : activeView === "students"
+          ? "Students"
+          : activeView === "questionnaire"
+            ? "Cuestionario"
+            : "Workspace";
 
   function openNewLead() {
     setLeadMode("add");
@@ -317,6 +351,30 @@ export function AdminPanel() {
     setStudentDraft(null);
   }
 
+  async function saveQuestionnaire() {
+    if (!isSupabaseConfigured()) {
+      setQuestionnaireStatus("Supabase no está configurado, las respuestas no se pueden guardar");
+      return;
+    }
+
+    const accessToken = getAccessToken();
+    if (!accessToken) {
+      window.location.href = "/login";
+      return;
+    }
+
+    try {
+      setQuestionnaireStatus("Guardando cuestionario...");
+      await saveQuestionnaireAnswers(questionnaireAnswers, accessToken);
+      setQuestionnaireStatus("Guardado en Supabase");
+      setSyncMessage("Questionnaire saved to Supabase");
+    } catch (error) {
+      console.error(error);
+      setQuestionnaireStatus("No se pudieron guardar las respuestas");
+      setSyncMessage("Could not save questionnaire answers");
+    }
+  }
+
   function handleLogout() {
     clearAdminSession();
     window.location.href = "/login";
@@ -402,20 +460,32 @@ export function AdminPanel() {
               <div>
                 <p className="section-kicker">Alberto Workspace</p>
                 <h1 className="mt-1 font-heading text-[2rem] font-normal leading-tight sm:text-4xl md:text-3xl xl:text-4xl">
-                  {activeView === "dashboard" ? "Dashboard" : activeView === "leads" ? "Leads" : "Students"}
+                  {activeViewTitle}
                 </h1>
                 {syncMessage && <p className="mt-1 text-xs font-bold text-brand-navy/46">{syncMessage}</p>}
               </div>
-              <div className="grid gap-2 sm:grid-cols-2 md:w-auto">
-                <button type="button" onClick={openNewLead} className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-brand-red px-4 text-sm font-extrabold text-white transition hover:bg-brand-red-dark sm:h-11">
-                  <Plus size={17} aria-hidden />
-                  Add Lead
-                </button>
-                <button type="button" onClick={openNewStudent} className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-brand-navy px-4 text-sm font-extrabold text-white transition hover:bg-brand-blue sm:h-11">
-                  <Plus size={17} aria-hidden />
-                  Add Student
-                </button>
-              </div>
+              {activeView === "questionnaire" ? (
+                <div className="grid gap-2 sm:grid-cols-[auto_auto] md:w-auto md:items-center">
+                  <p className="rounded-md border border-brand-navy/10 bg-surface-cream px-3 py-2 text-center text-xs font-extrabold text-brand-navy/58">
+                    {questionnaireCompleted}/{questionnaireQuestionCount} completadas
+                  </p>
+                  <button type="button" onClick={saveQuestionnaire} className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-brand-red px-4 text-sm font-extrabold text-white transition hover:bg-brand-red-dark sm:h-11">
+                    <Save size={17} aria-hidden />
+                    Guardar respuestas
+                  </button>
+                </div>
+              ) : (
+                <div className="grid gap-2 sm:grid-cols-2 md:w-auto">
+                  <button type="button" onClick={openNewLead} className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-brand-red px-4 text-sm font-extrabold text-white transition hover:bg-brand-red-dark sm:h-11">
+                    <Plus size={17} aria-hidden />
+                    Add Lead
+                  </button>
+                  <button type="button" onClick={openNewStudent} className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-brand-navy px-4 text-sm font-extrabold text-white transition hover:bg-brand-blue sm:h-11">
+                    <Plus size={17} aria-hidden />
+                    Add Student
+                  </button>
+                </div>
+              )}
             </div>
           </header>
 
@@ -466,6 +536,18 @@ export function AdminPanel() {
                   setStudentMode("edit");
                   setStudentDraft(student);
                 }}
+              />
+            )}
+
+            {activeView === "questionnaire" && (
+              <QuestionnaireView
+                answers={questionnaireAnswers}
+                completed={questionnaireCompleted}
+                status={questionnaireStatus}
+                onAnswerChange={(questionId, answer) =>
+                  setQuestionnaireAnswers((current) => ({ ...current, [questionId]: answer }))
+                }
+                onSave={saveQuestionnaire}
               />
             )}
           </div>
@@ -731,6 +813,161 @@ function Dashboard({
             </button>
           ))}
         </div>
+      </section>
+    </div>
+  );
+}
+
+function QuestionnaireView({
+  answers,
+  completed,
+  status,
+  onAnswerChange,
+  onSave,
+}: {
+  answers: Record<number, string>;
+  completed: number;
+  status: string | null;
+  onAnswerChange: (questionId: number, answer: string) => void;
+  onSave: () => void;
+}) {
+  const [activeSectionId, setActiveSectionId] = useState(questionnaireSections[0]?.id ?? "");
+  const completionPercent = questionnaireQuestionCount
+    ? Math.round((completed / questionnaireQuestionCount) * 100)
+    : 0;
+
+  function handleSectionClick(sectionId: string) {
+    setActiveSectionId(sectionId);
+    document.getElementById(`questionnaire-${sectionId}`)?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }
+
+  return (
+    <div className="grid gap-4 xl:grid-cols-[17rem_1fr] xl:gap-5">
+      <aside className="xl:sticky xl:top-28 xl:self-start">
+        <section className="overflow-hidden rounded-xl bg-brand-navy text-white shadow-xl shadow-brand-navy/12">
+          <div className="p-4 sm:p-5">
+            <p className="section-kicker-dark">Brief de contenido</p>
+            <h2 className="mt-2 font-heading text-2xl font-normal leading-tight">Cuestionario</h2>
+            <p className="mt-3 text-sm font-semibold leading-6 text-white/62">
+              Responde con calma. Cada respuesta queda guardada en Supabase para convertirla luego en copy real.
+            </p>
+          </div>
+
+          <div className="border-y border-white/10 p-4 sm:p-5">
+            <div className="flex items-end justify-between gap-3">
+              <div>
+                <p className="font-heading text-4xl font-normal text-brand-teal-light">{completionPercent}%</p>
+                <p className="mt-1 text-xs font-extrabold uppercase tracking-[0.08em] text-white/48">
+                  {completed}/{questionnaireQuestionCount} preguntas
+                </p>
+              </div>
+              <ClipboardList className="text-brand-teal-light" size={32} strokeWidth={1.6} aria-hidden />
+            </div>
+            <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/12">
+              <div className="h-full rounded-full bg-brand-teal-light" style={{ width: `${completionPercent}%` }} />
+            </div>
+          </div>
+
+          <nav className="flex gap-2 overflow-x-auto p-3 [scrollbar-width:none] xl:grid xl:max-h-[48vh] xl:overflow-y-auto" aria-label="Categorías del cuestionario">
+            {questionnaireSections.map((section) => {
+              const sectionCompleted = section.questions.filter((question) => answers[question.id]?.trim()).length;
+              const isActive = activeSectionId === section.id;
+
+              return (
+                <button
+                  key={section.id}
+                  type="button"
+                  onClick={() => handleSectionClick(section.id)}
+                  className={`min-w-[13rem] rounded-lg border px-3 py-3 text-left transition xl:min-w-0 ${
+                    isActive
+                      ? "border-brand-teal-light/45 bg-brand-teal/24"
+                      : "border-white/10 bg-white/[0.04] hover:border-brand-teal-light/28 hover:bg-white/[0.07]"
+                  }`}
+                >
+                  <span className="block truncate text-sm font-extrabold text-white">{section.title}</span>
+                  <span className="mt-1 block text-xs font-bold text-white/46">
+                    {sectionCompleted}/{section.questions.length} respondidas
+                  </span>
+                </button>
+              );
+            })}
+          </nav>
+        </section>
+      </aside>
+
+      <section className="grid gap-4">
+        <div className="rounded-xl border border-brand-navy/10 bg-surface-white p-4 shadow-xl shadow-brand-navy/6 sm:p-5">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-3xl">
+              <p className="section-kicker">105 Preguntas</p>
+              <h2 className="mt-1 font-heading text-3xl font-normal leading-tight sm:text-4xl">
+                Información real para escribir una web que sí represente el negocio.
+              </h2>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-[auto_auto]">
+              {status && (
+                <p className="inline-flex min-h-11 items-center justify-center rounded-md border border-brand-navy/10 bg-surface-cream px-4 text-sm font-extrabold text-brand-navy/58">
+                  {status}
+                </p>
+              )}
+              <button type="button" onClick={onSave} className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-brand-red px-5 text-sm font-extrabold text-white transition hover:bg-brand-red-dark">
+                <Save size={17} aria-hidden />
+                Guardar respuestas
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {questionnaireSections.map((section) => {
+          const answeredInSection = section.questions.filter((question) => answers[question.id]?.trim()).length;
+
+          return (
+            <article
+              key={section.id}
+              id={`questionnaire-${section.id}`}
+              className="scroll-mt-28 overflow-hidden rounded-xl border border-brand-navy/10 bg-surface-white shadow-xl shadow-brand-navy/6"
+            >
+              <header className="border-b border-brand-navy/10 bg-brand-navy px-4 py-4 text-white sm:px-5">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <p className="section-kicker-dark">Categoría</p>
+                    <h3 className="mt-1 font-heading text-2xl font-normal leading-tight sm:text-3xl">{section.title}</h3>
+                  </div>
+                  <p className="w-fit rounded-full border border-brand-teal-light/22 bg-brand-teal/20 px-3 py-1 text-xs font-extrabold text-brand-teal-light">
+                    {answeredInSection}/{section.questions.length} respondidas
+                  </p>
+                </div>
+              </header>
+
+              <div className="grid gap-3 p-3 sm:p-4">
+                {section.questions.map((question) => (
+                  <label
+                    key={question.id}
+                    className="grid gap-3 rounded-lg border border-brand-navy/10 bg-surface-cream p-3.5 transition focus-within:border-brand-teal/50 focus-within:bg-surface-white focus-within:shadow-lg focus-within:shadow-brand-navy/6 sm:p-4"
+                  >
+                    <span className="grid gap-2 sm:grid-cols-[3.25rem_1fr] sm:items-start">
+                      <span className="inline-flex h-8 w-fit items-center justify-center rounded-md bg-brand-blue px-2.5 text-xs font-extrabold text-white sm:w-full">
+                        {String(question.id).padStart(3, "0")}
+                      </span>
+                      <span className="text-sm font-extrabold leading-6 text-brand-navy sm:text-[0.95rem]">
+                        {question.text}
+                      </span>
+                    </span>
+                    <textarea
+                      value={answers[question.id] ?? ""}
+                      onChange={(event) => onAnswerChange(question.id, event.target.value)}
+                      placeholder="Respuesta de Alberto..."
+                      className="min-h-28 resize-y rounded-md border border-brand-navy/12 bg-surface-white px-3 py-3 text-sm font-semibold leading-6 text-brand-navy outline-none transition placeholder:text-brand-navy/32 focus:border-brand-teal focus:ring-4 focus:ring-brand-teal/10"
+                    />
+                  </label>
+                ))}
+              </div>
+            </article>
+          );
+        })}
       </section>
     </div>
   );
