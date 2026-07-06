@@ -437,8 +437,8 @@ export function AdminPanel() {
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-surface-cream text-brand-navy">
-      <div className="grid min-h-screen lg:grid-cols-[13.5rem_1fr] xl:grid-cols-[14rem_1fr]">
-        <aside className="bg-brand-navy px-3 py-3 text-white sm:px-4 lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:px-3.5 lg:py-4">
+      <div className="grid min-h-screen min-w-0 lg:grid-cols-[13.5rem_1fr] xl:grid-cols-[14rem_1fr]">
+        <aside className="sticky top-0 z-40 min-w-0 bg-brand-navy px-3 py-3 text-white shadow-xl shadow-brand-navy/18 sm:px-4 lg:top-0 lg:flex lg:h-screen lg:flex-col lg:px-3.5 lg:py-4">
           <div className="flex items-center justify-between gap-3 lg:block">
             <div className="flex items-center gap-2.5 lg:gap-2">
               <span className="relative size-10 shrink-0 overflow-hidden rounded-md border border-white/10 bg-brand-blue lg:size-9">
@@ -468,7 +468,7 @@ export function AdminPanel() {
             </div>
           </div>
 
-          <nav className="mt-4 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] lg:mt-7 lg:grid lg:gap-1.5 lg:overflow-visible lg:pb-0" aria-label="Admin navigation">
+          <nav className="mt-3 grid grid-cols-4 gap-1.5 lg:mt-7 lg:grid-cols-1 lg:gap-1.5" aria-label="Admin navigation">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeView === item.view || (activeView === "student-detail" && item.view === "students");
@@ -484,14 +484,14 @@ export function AdminPanel() {
                     }
                     setActiveView(item.view);
                   }}
-                  className={`flex min-w-fit items-center gap-2 rounded-md px-3 py-2.5 text-left text-xs font-extrabold transition sm:text-sm lg:w-full lg:px-2.5 ${
+                  className={`flex min-w-0 flex-col items-center justify-center gap-1 rounded-md px-1.5 py-2 text-center text-[0.68rem] font-extrabold leading-tight transition sm:text-xs lg:w-full lg:flex-row lg:justify-start lg:gap-2 lg:px-2.5 lg:py-2.5 lg:text-left lg:text-sm ${
                     isActive
                       ? "bg-brand-teal text-white shadow-lg shadow-brand-teal/18"
                       : "text-white/70 hover:bg-white/8 hover:text-white"
                   }`}
                 >
-                  <Icon size={18} strokeWidth={1.8} aria-hidden />
-                  <span>{item.label}</span>
+                  <Icon size={17} strokeWidth={1.8} aria-hidden />
+                  <span className="max-w-full truncate">{item.label}</span>
                 </button>
               );
             })}
@@ -516,7 +516,7 @@ export function AdminPanel() {
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div className="min-w-0">
                 <p className="section-kicker">Alberto Workspace</p>
-                <h1 className="mt-1 break-words font-heading text-[1.75rem] font-normal leading-tight sm:text-4xl md:text-3xl xl:text-4xl">
+                <h1 className="mt-1 break-words font-heading text-[1.55rem] font-normal leading-tight sm:text-4xl md:text-3xl xl:text-4xl">
                   {activeViewTitle}
                 </h1>
                 {syncMessage && <p className="mt-1 text-xs font-bold text-brand-navy/46">{syncMessage}</p>}
@@ -816,7 +816,7 @@ function Dashboard({
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="section-kicker">Lead Pipeline</p>
-              <h2 className="mt-1 font-heading text-2xl font-normal leading-tight sm:text-3xl xl:text-2xl">Current opportunity flow</h2>
+              <h2 className="mt-1 font-heading text-[1.55rem] font-normal leading-tight sm:text-3xl xl:text-2xl">Current opportunity flow</h2>
             </div>
             <MessageSquareText className="text-brand-teal" size={26} aria-hidden />
           </div>
@@ -847,7 +847,7 @@ function Dashboard({
 
         <section className="rounded-xl bg-brand-navy p-4 text-white shadow-xl shadow-brand-navy/12 sm:p-5">
           <p className="section-kicker-dark">Teaching Snapshot</p>
-          <h2 className="mt-1 font-heading text-2xl font-normal leading-tight sm:text-3xl xl:text-2xl">Student activity</h2>
+              <h2 className="mt-1 font-heading text-[1.55rem] font-normal leading-tight sm:text-3xl xl:text-2xl">Student activity</h2>
           <div className="mt-4 grid gap-2.5">
             {students.slice(0, 4).map((student) => (
               <button
@@ -874,7 +874,7 @@ function Dashboard({
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="section-kicker">Recent Leads</p>
-            <h2 className="mt-1 font-heading text-2xl font-normal leading-tight sm:text-3xl">Fresh form submissions</h2>
+            <h2 className="mt-1 font-heading text-[1.55rem] font-normal leading-tight sm:text-3xl">Fresh form submissions</h2>
           </div>
           <UserCheck className="text-brand-blue" size={26} aria-hidden />
         </div>
@@ -882,10 +882,10 @@ function Dashboard({
           {leads.slice(0, 6).map((lead) => (
             <button key={lead.id} type="button" onClick={() => openLead(lead)} className="grid min-w-0 gap-3 rounded-lg border border-white/10 bg-brand-navy p-3 text-left text-white transition hover:border-brand-teal-light/45 hover:bg-brand-blue sm:p-3.5 md:grid-cols-[1.1fr_1fr_0.7fr_auto] md:items-center">
               <div className="min-w-0">
-                <p className="font-extrabold text-white">{lead.name}</p>
+                <p className="break-words font-extrabold text-white">{lead.name}</p>
                 <p className="mt-1 break-all text-xs font-semibold text-white/54">{lead.email}</p>
               </div>
-              <p className="text-sm font-bold text-white/70">{lead.interest}</p>
+              <p className="break-words text-sm font-bold text-white/70">{lead.interest}</p>
               <StatusPill status={lead.status} />
               <ChevronRight size={18} className="hidden text-white/42 md:block" aria-hidden />
             </button>
@@ -1139,10 +1139,10 @@ function StudentProfilePage({
                   <h2 className="mt-1 break-words font-heading text-2xl font-normal leading-tight sm:text-5xl">{student.name}</h2>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <StatusPill status={student.status} />
-                    <span className="max-w-full rounded-full border border-white/12 bg-white/[0.06] px-3 py-1 text-xs font-extrabold text-white/64">
+                    <span className="max-w-full break-words rounded-full border border-white/12 bg-white/[0.06] px-3 py-1 text-xs font-extrabold text-white/64">
                       {student.program}
                     </span>
-                    <span className="max-w-full rounded-full border border-brand-teal-light/20 bg-brand-teal/18 px-3 py-1 text-xs font-extrabold text-brand-teal-light">
+                    <span className="max-w-full break-words rounded-full border border-brand-teal-light/20 bg-brand-teal/18 px-3 py-1 text-xs font-extrabold text-brand-teal-light">
                       {deliveryMode}
                     </span>
                   </div>
@@ -1193,7 +1193,7 @@ function StudentProfilePage({
 
       <div className="grid gap-4 xl:grid-cols-[0.78fr_1.22fr] xl:gap-5">
         <section className="grid gap-4">
-          <div className="rounded-xl border border-brand-navy/10 bg-surface-white p-4 shadow-xl shadow-brand-navy/6 sm:p-5">
+          <div className="min-w-0 rounded-xl border border-brand-navy/10 bg-surface-white p-4 shadow-xl shadow-brand-navy/6 sm:p-5">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="section-kicker">Student Info</p>
@@ -1210,12 +1210,12 @@ function StudentProfilePage({
             </div>
           </div>
 
-          <div className="rounded-xl bg-brand-blue p-4 text-white shadow-xl shadow-brand-navy/10 sm:p-5">
+          <div className="min-w-0 rounded-xl bg-brand-blue p-4 text-white shadow-xl shadow-brand-navy/10 sm:p-5">
             <p className="section-kicker-dark">Learning Notes</p>
             <h3 className="mt-1 font-heading text-2xl font-normal">Teacher briefing</h3>
             <div className="mt-4 grid gap-3">
               {recentNotes.map((note) => (
-                <div key={note} className="rounded-lg border border-white/10 bg-white/[0.07] p-3 text-sm font-semibold leading-6 text-white/70">
+                <div key={note} className="break-words rounded-lg border border-white/10 bg-white/[0.07] p-3 text-sm font-semibold leading-6 text-white/70">
                   {note}
                 </div>
               ))}
@@ -1230,7 +1230,7 @@ function StudentProfilePage({
             <StudentKpiCard label="Sessions" value="12" icon={CalendarDays} tone="teal" />
           </div>
 
-          <div className="rounded-xl border border-brand-navy/10 bg-surface-white p-4 shadow-xl shadow-brand-navy/6 sm:p-5">
+          <div className="min-w-0 rounded-xl border border-brand-navy/10 bg-surface-white p-4 shadow-xl shadow-brand-navy/6 sm:p-5">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div className="min-w-0">
                 <p className="section-kicker">Progress</p>
@@ -1262,8 +1262,8 @@ function StudentProfilePage({
             </div>
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-2">
-            <div className="rounded-xl border border-brand-navy/10 bg-surface-white p-4 shadow-xl shadow-brand-navy/6 sm:p-5">
+          <div className="grid min-w-0 gap-4 lg:grid-cols-2">
+            <div className="min-w-0 rounded-xl border border-brand-navy/10 bg-surface-white p-4 shadow-xl shadow-brand-navy/6 sm:p-5">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="section-kicker">Homework</p>
@@ -1275,7 +1275,7 @@ function StudentProfilePage({
                 {homework.map((task) => (
                   <div key={task.title} className="rounded-lg border border-brand-navy/10 bg-surface-cream p-3">
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
-                      <p className="font-extrabold leading-5 text-brand-navy">{task.title}</p>
+                    <p className="break-words font-extrabold leading-5 text-brand-navy">{task.title}</p>
                       <span className="shrink-0 rounded-full bg-brand-teal/14 px-2.5 py-1 text-[0.68rem] font-extrabold text-brand-blue">
                         {task.status}
                       </span>
@@ -1286,7 +1286,7 @@ function StudentProfilePage({
               </div>
             </div>
 
-            <div className="rounded-xl border border-brand-navy/10 bg-surface-white p-4 shadow-xl shadow-brand-navy/6 sm:p-5">
+            <div className="min-w-0 rounded-xl border border-brand-navy/10 bg-surface-white p-4 shadow-xl shadow-brand-navy/6 sm:p-5">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="section-kicker">Classroom</p>
@@ -1417,15 +1417,15 @@ function StudentOperationButton({
   return (
     <button
       type="button"
-      className="flex items-center justify-between gap-3 rounded-lg border border-brand-navy/10 bg-surface-cream p-3 text-left transition hover:border-brand-teal/40 hover:bg-surface-white"
+      className="flex min-w-0 items-center justify-between gap-3 rounded-lg border border-brand-navy/10 bg-surface-cream p-3 text-left transition hover:border-brand-teal/40 hover:bg-surface-white"
     >
       <span className="flex min-w-0 items-center gap-3">
         <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-brand-teal text-white">
           <Icon size={18} aria-hidden />
         </span>
         <span className="min-w-0">
-          <span className="block truncate text-sm font-extrabold text-brand-navy">{label}</span>
-          <span className="mt-1 block truncate text-xs font-bold text-brand-navy/46">{meta}</span>
+          <span className="block break-words text-sm font-extrabold text-brand-navy">{label}</span>
+          <span className="mt-1 block break-words text-xs font-bold text-brand-navy/46">{meta}</span>
         </span>
       </span>
       <ChevronRight size={18} className="shrink-0 text-brand-navy/34" aria-hidden />
@@ -1475,9 +1475,9 @@ function LeadsView({
             onClick={() => onOpen(lead)}
             className="min-w-0 rounded-lg border border-brand-navy/10 bg-surface-cream p-3.5 text-left transition hover:border-brand-teal/40 hover:bg-surface-white"
           >
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex flex-col gap-3 min-[420px]:flex-row min-[420px]:items-start min-[420px]:justify-between">
               <div className="min-w-0">
-                <p className="truncate font-extrabold text-brand-navy">{lead.name}</p>
+                <p className="break-words font-extrabold text-brand-navy">{lead.name}</p>
                 <p className="mt-1 break-all text-xs font-semibold text-brand-navy/48">{lead.email}</p>
               </div>
               <StatusPill status={lead.status} />
@@ -1600,9 +1600,9 @@ function StudentsView({
             onClick={() => onOpen(student)}
             className="min-w-0 rounded-lg border border-brand-navy/10 bg-surface-cream p-3.5 text-left transition hover:border-brand-teal/40 hover:bg-surface-white"
           >
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex flex-col gap-3 min-[420px]:flex-row min-[420px]:items-start min-[420px]:justify-between">
               <div className="min-w-0">
-                <p className="truncate font-extrabold text-brand-navy">{student.name}</p>
+                <p className="break-words font-extrabold text-brand-navy">{student.name}</p>
                 <p className="mt-1 break-all text-xs font-semibold text-brand-navy/48">{student.email}</p>
               </div>
               <StatusPill status={student.status} />
@@ -2139,7 +2139,7 @@ function StatusPill({ status }: { status: LeadStatus | StudentStatus }) {
 
 function ProgressBar({ value, dark = false }: { value: number; dark?: boolean }) {
   return (
-    <div className="min-w-[8rem]">
+    <div className="w-full min-w-0">
       <div className={`mb-2 flex items-center justify-between text-xs font-extrabold ${dark ? "text-white/58" : "text-brand-navy/52"}`}>
         <span>Progress</span>
         <span>{value}%</span>
