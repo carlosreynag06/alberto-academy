@@ -436,7 +436,7 @@ export function AdminPanel() {
   }
 
   return (
-    <main className="min-h-screen bg-surface-cream text-brand-navy">
+    <main className="min-h-screen overflow-x-hidden bg-surface-cream text-brand-navy">
       <div className="grid min-h-screen lg:grid-cols-[13.5rem_1fr] xl:grid-cols-[14rem_1fr]">
         <aside className="bg-brand-navy px-3 py-3 text-white sm:px-4 lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:px-3.5 lg:py-4">
           <div className="flex items-center justify-between gap-3 lg:block">
@@ -468,7 +468,7 @@ export function AdminPanel() {
             </div>
           </div>
 
-          <nav className="mt-5 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] lg:mt-7 lg:grid lg:gap-1.5 lg:overflow-visible lg:pb-0" aria-label="Admin navigation">
+          <nav className="mt-4 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] lg:mt-7 lg:grid lg:gap-1.5 lg:overflow-visible lg:pb-0" aria-label="Admin navigation">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeView === item.view || (activeView === "student-detail" && item.view === "students");
@@ -484,7 +484,7 @@ export function AdminPanel() {
                     }
                     setActiveView(item.view);
                   }}
-                  className={`flex min-w-fit items-center gap-2.5 rounded-md px-3 py-2.5 text-left text-sm font-extrabold transition lg:w-full lg:px-2.5 ${
+                  className={`flex min-w-fit items-center gap-2 rounded-md px-3 py-2.5 text-left text-xs font-extrabold transition sm:text-sm lg:w-full lg:px-2.5 ${
                     isActive
                       ? "bg-brand-teal text-white shadow-lg shadow-brand-teal/18"
                       : "text-white/70 hover:bg-white/8 hover:text-white"
@@ -511,12 +511,12 @@ export function AdminPanel() {
           </button>
         </aside>
 
-        <section className="min-w-0">
-          <header className="sticky top-0 z-20 border-b border-brand-navy/10 bg-surface-white/88 px-4 py-3 backdrop-blur-xl sm:px-6 lg:px-6">
+        <section className="min-w-0 overflow-x-hidden">
+          <header className="z-20 border-b border-brand-navy/10 bg-surface-white/88 px-3 py-3 backdrop-blur-xl sm:px-6 lg:sticky lg:top-0 lg:px-6">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              <div>
+              <div className="min-w-0">
                 <p className="section-kicker">Alberto Workspace</p>
-                <h1 className="mt-1 font-heading text-[2rem] font-normal leading-tight sm:text-4xl md:text-3xl xl:text-4xl">
+                <h1 className="mt-1 break-words font-heading text-[1.75rem] font-normal leading-tight sm:text-4xl md:text-3xl xl:text-4xl">
                   {activeViewTitle}
                 </h1>
                 {syncMessage && <p className="mt-1 text-xs font-bold text-brand-navy/46">{syncMessage}</p>}
@@ -530,7 +530,7 @@ export function AdminPanel() {
                     type="button"
                     onClick={saveQuestionnaire}
                     disabled={questionnaireSaveState === "saving"}
-                    className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-brand-red px-4 text-sm font-extrabold text-white transition hover:bg-brand-red-dark disabled:cursor-not-allowed disabled:opacity-60 sm:h-11"
+                    className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-brand-red px-4 text-sm font-extrabold text-white transition hover:bg-brand-red-dark disabled:cursor-not-allowed disabled:opacity-60 sm:h-11"
                   >
                     <Save size={17} aria-hidden />
                     {questionnaireSaveState === "saving" ? "Guardando..." : "Guardar respuestas"}
@@ -562,7 +562,7 @@ export function AdminPanel() {
             </div>
           </header>
 
-          <div className="px-4 py-4 sm:px-6 sm:py-5 lg:px-6 lg:py-6">
+          <div className="px-3 py-3 sm:px-6 sm:py-5 lg:px-6 lg:py-6">
             {activeView === "dashboard" && (
               <Dashboard
                 leadStats={leadStats}
@@ -880,10 +880,10 @@ function Dashboard({
         </div>
         <div className="mt-4 grid gap-2.5">
           {leads.slice(0, 6).map((lead) => (
-            <button key={lead.id} type="button" onClick={() => openLead(lead)} className="grid gap-3 rounded-lg border border-white/10 bg-brand-navy p-3 text-left text-white transition hover:border-brand-teal-light/45 hover:bg-brand-blue sm:p-3.5 md:grid-cols-[1.1fr_1fr_0.7fr_auto] md:items-center">
-              <div>
+            <button key={lead.id} type="button" onClick={() => openLead(lead)} className="grid min-w-0 gap-3 rounded-lg border border-white/10 bg-brand-navy p-3 text-left text-white transition hover:border-brand-teal-light/45 hover:bg-brand-blue sm:p-3.5 md:grid-cols-[1.1fr_1fr_0.7fr_auto] md:items-center">
+              <div className="min-w-0">
                 <p className="font-extrabold text-white">{lead.name}</p>
-                <p className="mt-1 text-xs font-semibold text-white/54">{lead.email}</p>
+                <p className="mt-1 break-all text-xs font-semibold text-white/54">{lead.email}</p>
               </div>
               <p className="text-sm font-bold text-white/70">{lead.interest}</p>
               <StatusPill status={lead.status} />
@@ -944,7 +944,7 @@ function QuestionnaireView({
 
   return (
     <div className="grid gap-4 xl:grid-cols-[17rem_1fr] xl:gap-5">
-      <aside className="xl:sticky xl:top-28 xl:self-start">
+      <aside className="min-w-0 xl:sticky xl:top-28 xl:self-start">
         <section className="overflow-hidden rounded-xl bg-brand-navy text-white shadow-xl shadow-brand-navy/12">
           <div className="p-4 sm:p-5">
             <p className="section-kicker-dark">Brief de contenido</p>
@@ -993,17 +993,17 @@ function QuestionnaireView({
         </section>
       </aside>
 
-      <section className="grid gap-4">
+      <section className="grid min-w-0 gap-4">
         <div className="rounded-xl border border-brand-navy/10 bg-surface-white p-4 shadow-xl shadow-brand-navy/6 sm:p-5">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-            <div className="max-w-3xl">
+            <div className="min-w-0 max-w-3xl">
               <p className="section-kicker">105 Preguntas</p>
-              <h2 className="mt-1 max-w-[42rem] font-heading text-3xl font-normal leading-tight sm:text-4xl">
+              <h2 className="mt-1 max-w-[42rem] font-heading text-2xl font-normal leading-tight sm:text-4xl">
                 Información real para escribir una web que sí represente el negocio.
               </h2>
             </div>
-            <div className="grid shrink-0 gap-2 sm:grid-cols-[auto_auto] sm:items-center lg:pt-9">
-              <p className={`inline-flex h-9 items-center justify-center gap-2 rounded-md border px-3 text-xs font-extrabold ${saveMessageClass}`}>
+            <div className="grid min-w-0 shrink-0 gap-2 sm:grid-cols-[auto_auto] sm:items-center lg:pt-9">
+              <p className={`inline-flex min-h-9 items-center justify-center gap-2 rounded-md border px-3 py-2 text-center text-xs font-extrabold ${saveMessageClass}`}>
                 {saveState === "saved" && <CheckCircle2 size={15} aria-hidden />}
                 {saveMessage}
               </p>
@@ -1047,11 +1047,11 @@ function QuestionnaireView({
                     key={question.id}
                     className="grid gap-3 rounded-lg border border-brand-navy/10 bg-surface-cream p-3.5 transition focus-within:border-brand-teal/50 focus-within:bg-surface-white focus-within:shadow-lg focus-within:shadow-brand-navy/6 sm:p-4"
                   >
-                    <span className="grid gap-2 sm:grid-cols-[3.25rem_1fr] sm:items-start">
+                    <span className="grid min-w-0 gap-2 sm:grid-cols-[3.25rem_1fr] sm:items-start">
                       <span className="inline-flex h-8 w-fit items-center justify-center rounded-md bg-brand-blue px-2.5 text-xs font-extrabold text-white sm:w-full">
                         {String(question.id).padStart(3, "0")}
                       </span>
-                      <span className="text-sm font-extrabold leading-6 text-brand-navy sm:text-[0.95rem]">
+                      <span className="min-w-0 text-sm font-extrabold leading-6 text-brand-navy sm:text-[0.95rem]">
                         {question.text}
                       </span>
                     </span>
@@ -1116,7 +1116,7 @@ function StudentProfilePage({
   ];
 
   return (
-    <div className="grid gap-4 lg:gap-5">
+    <div className="grid min-w-0 gap-4 lg:gap-5">
       <section className="overflow-hidden rounded-xl bg-brand-navy text-white shadow-xl shadow-brand-navy/12">
         <div className="grid gap-0 xl:grid-cols-[1.08fr_0.92fr]">
           <div className="p-4 sm:p-6">
@@ -1130,19 +1130,19 @@ function StudentProfilePage({
             </button>
 
             <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-              <div className="flex items-start gap-4">
-                <div className="grid size-16 shrink-0 place-items-center rounded-xl bg-brand-teal text-2xl font-heading text-white shadow-lg shadow-brand-teal/18 sm:size-20 sm:text-3xl">
+              <div className="flex min-w-0 items-start gap-3 sm:gap-4">
+                <div className="grid size-14 shrink-0 place-items-center rounded-xl bg-brand-teal text-2xl font-heading text-white shadow-lg shadow-brand-teal/18 sm:size-20 sm:text-3xl">
                   {initials}
                 </div>
                 <div className="min-w-0">
                   <p className="section-kicker-dark">Student workspace</p>
-                  <h2 className="mt-1 font-heading text-3xl font-normal leading-tight sm:text-5xl">{student.name}</h2>
+                  <h2 className="mt-1 break-words font-heading text-2xl font-normal leading-tight sm:text-5xl">{student.name}</h2>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <StatusPill status={student.status} />
-                    <span className="rounded-full border border-white/12 bg-white/[0.06] px-3 py-1 text-xs font-extrabold text-white/64">
+                    <span className="max-w-full rounded-full border border-white/12 bg-white/[0.06] px-3 py-1 text-xs font-extrabold text-white/64">
                       {student.program}
                     </span>
-                    <span className="rounded-full border border-brand-teal-light/20 bg-brand-teal/18 px-3 py-1 text-xs font-extrabold text-brand-teal-light">
+                    <span className="max-w-full rounded-full border border-brand-teal-light/20 bg-brand-teal/18 px-3 py-1 text-xs font-extrabold text-brand-teal-light">
                       {deliveryMode}
                     </span>
                   </div>
@@ -1152,7 +1152,7 @@ function StudentProfilePage({
               <button
                 type="button"
                 onClick={onEdit}
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-brand-red px-4 text-sm font-extrabold text-white transition hover:bg-brand-red-dark sm:min-w-36"
+                className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-brand-red px-4 text-sm font-extrabold text-white transition hover:bg-brand-red-dark sm:w-auto sm:min-w-36"
               >
                 <Pencil size={17} aria-hidden />
                 Edit profile
@@ -1170,8 +1170,8 @@ function StudentProfilePage({
             <p className="section-kicker-dark">Next live lesson</p>
             <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.06] p-4">
               <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="font-heading text-3xl font-normal">{nextSession}</p>
+                <div className="min-w-0">
+                  <p className="break-words font-heading text-2xl font-normal sm:text-3xl">{nextSession}</p>
                   <p className="mt-2 text-sm font-semibold text-white/58">60-minute {student.level.toLowerCase()} session</p>
                 </div>
                 <span className="grid size-11 place-items-center rounded-lg bg-brand-blue text-white">
@@ -1232,11 +1232,11 @@ function StudentProfilePage({
 
           <div className="rounded-xl border border-brand-navy/10 bg-surface-white p-4 shadow-xl shadow-brand-navy/6 sm:p-5">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-              <div>
+              <div className="min-w-0">
                 <p className="section-kicker">Progress</p>
                 <h3 className="mt-1 font-heading text-2xl font-normal leading-tight">Learning path</h3>
               </div>
-              <button type="button" className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-brand-navy px-4 text-sm font-extrabold text-white transition hover:bg-brand-blue">
+              <button type="button" className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-brand-navy px-4 text-sm font-extrabold text-white transition hover:bg-brand-blue sm:w-auto">
                 <Target size={17} aria-hidden />
                 Update goals
               </button>
@@ -1246,11 +1246,11 @@ function StudentProfilePage({
             </div>
             <div className="mt-5 grid gap-3">
               {learningPlan.map((item) => (
-                <div key={item.title} className="grid gap-3 rounded-lg border border-brand-navy/10 bg-surface-cream p-3.5 sm:grid-cols-[auto_1fr_auto] sm:items-center">
+                <div key={item.title} className="grid min-w-0 gap-3 rounded-lg border border-brand-navy/10 bg-surface-cream p-3.5 sm:grid-cols-[auto_1fr_auto] sm:items-center">
                   <span className={`grid size-10 place-items-center rounded-lg ${item.done ? "bg-brand-teal text-white" : "bg-brand-navy/8 text-brand-navy/46"}`}>
                     <CheckCircle2 size={19} aria-hidden />
                   </span>
-                  <div>
+                  <div className="min-w-0">
                     <p className="font-extrabold text-brand-navy">{item.title}</p>
                     <p className="mt-1 text-sm font-semibold text-brand-navy/54">{item.detail}</p>
                   </div>
@@ -1274,7 +1274,7 @@ function StudentProfilePage({
               <div className="mt-4 grid gap-3">
                 {homework.map((task) => (
                   <div key={task.title} className="rounded-lg border border-brand-navy/10 bg-surface-cream p-3">
-                    <div className="flex items-start justify-between gap-3">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
                       <p className="font-extrabold leading-5 text-brand-navy">{task.title}</p>
                       <span className="shrink-0 rounded-full bg-brand-teal/14 px-2.5 py-1 text-[0.68rem] font-extrabold text-brand-blue">
                         {task.status}
@@ -1320,7 +1320,7 @@ function StudentActionButton({
   return (
     <button
       type="button"
-      className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-md px-4 text-sm font-extrabold text-white transition ${
+      className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-md px-4 text-center text-sm font-extrabold text-white transition ${
         tone === "red" ? "bg-brand-red hover:bg-brand-red-dark" : "bg-white/[0.08] hover:bg-white/[0.13]"
       }`}
     >
@@ -1395,7 +1395,7 @@ function StudentKpiCard({
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-white/60">{label}</p>
-          <p className="mt-4 font-heading text-4xl font-normal leading-none">{value}</p>
+          <p className="mt-4 font-heading text-3xl font-normal leading-none sm:text-4xl">{value}</p>
         </div>
         <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-white/14">
           <Icon size={21} aria-hidden />
@@ -1473,23 +1473,23 @@ function LeadsView({
             key={lead.id}
             type="button"
             onClick={() => onOpen(lead)}
-            className="rounded-lg border border-brand-navy/10 bg-surface-cream p-3.5 text-left transition hover:border-brand-teal/40 hover:bg-surface-white"
+            className="min-w-0 rounded-lg border border-brand-navy/10 bg-surface-cream p-3.5 text-left transition hover:border-brand-teal/40 hover:bg-surface-white"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="truncate font-extrabold text-brand-navy">{lead.name}</p>
-                <p className="mt-1 truncate text-xs font-semibold text-brand-navy/48">{lead.email}</p>
+                <p className="mt-1 break-all text-xs font-semibold text-brand-navy/48">{lead.email}</p>
               </div>
               <StatusPill status={lead.status} />
             </div>
             <div className="mt-3 grid gap-2 border-t border-brand-navy/8 pt-3 text-xs font-bold text-brand-navy/58">
-              <div className="flex items-center justify-between gap-3">
+              <div className="grid gap-1">
                 <span>Interest</span>
-                <span className="text-right text-brand-navy/78">{lead.interest}</span>
+                <span className="text-brand-navy/78">{lead.interest}</span>
               </div>
-              <div className="flex items-center justify-between gap-3">
+              <div className="grid gap-1">
                 <span>Phone</span>
-                <span className="text-right text-brand-navy/78">{lead.phone || "Not provided"}</span>
+                <span className="break-words text-brand-navy/78">{lead.phone || "Not provided"}</span>
               </div>
               <div className="flex items-center justify-between gap-3">
                 <span>Level</span>
@@ -1598,24 +1598,24 @@ function StudentsView({
             key={student.id}
             type="button"
             onClick={() => onOpen(student)}
-            className="rounded-lg border border-brand-navy/10 bg-surface-cream p-3.5 text-left transition hover:border-brand-teal/40 hover:bg-surface-white"
+            className="min-w-0 rounded-lg border border-brand-navy/10 bg-surface-cream p-3.5 text-left transition hover:border-brand-teal/40 hover:bg-surface-white"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="truncate font-extrabold text-brand-navy">{student.name}</p>
-                <p className="mt-1 truncate text-xs font-semibold text-brand-navy/48">{student.email}</p>
+                <p className="mt-1 break-all text-xs font-semibold text-brand-navy/48">{student.email}</p>
               </div>
               <StatusPill status={student.status} />
             </div>
             <div className="mt-3 border-t border-brand-navy/8 pt-3">
               <div className="grid gap-2 text-xs font-bold text-brand-navy/58">
-                <div className="flex items-center justify-between gap-3">
+                <div className="grid gap-1">
                   <span>Phone</span>
-                  <span className="text-right text-brand-navy/78">{student.phone || "Not provided"}</span>
+                  <span className="break-words text-brand-navy/78">{student.phone || "Not provided"}</span>
                 </div>
-                <div className="flex items-center justify-between gap-3">
+                <div className="grid gap-1">
                   <span>{student.program}</span>
-                  <span>{student.level}</span>
+                  <span className="text-brand-navy/78">{student.level}</span>
                 </div>
               </div>
               <ProgressBar value={student.progress} />
@@ -1689,20 +1689,20 @@ function TableHeader({
 }) {
   return (
     <div className="flex flex-col gap-4 p-4 sm:p-5 lg:flex-row lg:items-center lg:justify-between">
-      <div>
+      <div className="min-w-0">
         <p className="section-kicker">{kicker}</p>
-        <h2 className="mt-1 font-heading text-2xl font-normal">{title}</h2>
+        <h2 className="mt-1 break-words font-heading text-2xl font-normal">{title}</h2>
       </div>
-      <div className="flex flex-col gap-3 lg:items-end">
-        {children && <div className="flex flex-col gap-2 sm:flex-row">{children}</div>}
-        <div className="flex flex-col gap-3 sm:flex-row">
-        <label className="relative">
+      <div className="flex w-full flex-col gap-3 lg:w-auto lg:items-end">
+        {children && <div className="grid w-full gap-2 sm:grid-cols-2 lg:flex lg:w-auto lg:flex-row">{children}</div>}
+        <div className="grid w-full gap-3 sm:grid-cols-[1fr_auto] lg:w-auto">
+        <label className="relative min-w-0">
           <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-brand-navy/36" size={18} aria-hidden />
           <input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Search"
-            className="h-11 w-full rounded-md border border-brand-navy/10 bg-surface-cream pl-10 pr-4 text-sm font-semibold text-brand-navy outline-none transition focus:border-brand-teal focus:bg-surface-white focus:ring-4 focus:ring-brand-teal/10 sm:w-72"
+            className="h-11 w-full rounded-md border border-brand-navy/10 bg-surface-cream pl-10 pr-4 text-sm font-semibold text-brand-navy outline-none transition focus:border-brand-teal focus:bg-surface-white focus:ring-4 focus:ring-brand-teal/10 sm:w-full lg:w-72"
           />
         </label>
         <button type="button" onClick={onAdd} className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-brand-red px-4 text-sm font-extrabold text-white transition hover:bg-brand-red-dark">
@@ -1727,12 +1727,12 @@ function AdminFilterSelect({
   onChange: (value: string) => void;
 }) {
   return (
-    <label className="grid gap-1.5">
+    <label className="grid min-w-0 gap-1.5">
       <span className="text-[0.68rem] font-extrabold uppercase tracking-[0.08em] text-brand-navy/42">{label}</span>
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="h-9 rounded-md border border-brand-navy/10 bg-surface-cream px-3 text-xs font-extrabold text-brand-navy outline-none transition focus:border-brand-teal focus:bg-surface-white focus:ring-4 focus:ring-brand-teal/10"
+        className="h-9 w-full rounded-md border border-brand-navy/10 bg-surface-cream px-3 text-xs font-extrabold text-brand-navy outline-none transition focus:border-brand-teal focus:bg-surface-white focus:ring-4 focus:ring-brand-teal/10"
       >
         {options.map((option) => (
           <option key={option}>{option}</option>
@@ -1844,14 +1844,14 @@ function DetailShell({
   const isCompact = density === "compact";
 
   return (
-    <div className={`fixed inset-0 z-[80] bg-brand-navy/48 backdrop-blur-sm ${isDrawer ? "flex justify-end" : "grid place-items-center p-4"}`}>
+    <div className={`fixed inset-0 z-[80] bg-brand-navy/48 backdrop-blur-sm ${isDrawer ? "flex justify-end" : "grid place-items-center p-2 sm:p-4"}`}>
       <section className={`flex max-h-full w-full flex-col overflow-hidden bg-surface-white shadow-2xl shadow-brand-navy/30 ${
-        isDrawer ? (isCompact ? "h-full max-w-[30rem]" : "h-full max-w-[34rem]") : (isCompact ? "max-h-[88vh] max-w-xl rounded-xl" : "max-h-[90vh] max-w-2xl rounded-xl")
+        isDrawer ? (isCompact ? "h-full max-w-full sm:max-w-[30rem]" : "h-full max-w-full sm:max-w-[34rem]") : (isCompact ? "max-h-[94vh] max-w-xl rounded-xl" : "max-h-[94vh] max-w-2xl rounded-xl")
       }`}>
         <header className={`flex items-center justify-between gap-4 border-b border-brand-navy/10 bg-surface-white ${isCompact ? "p-3.5 sm:p-4" : "p-4"}`}>
-          <div>
+          <div className="min-w-0">
             <p className="section-kicker">{subtitle}</p>
-            <h2 className={`mt-1 font-heading font-normal leading-tight ${isCompact ? "text-2xl sm:text-[1.7rem]" : "text-2xl"}`}>{title}</h2>
+            <h2 className={`mt-1 break-words font-heading font-normal leading-tight ${isCompact ? "text-xl sm:text-[1.7rem]" : "text-2xl"}`}>{title}</h2>
           </div>
           <button type="button" onClick={onClose} className="grid size-10 place-items-center rounded-md border border-brand-navy/10 text-brand-navy transition hover:border-brand-teal hover:text-brand-blue" aria-label="Close detail sheet">
             <X size={20} aria-hidden />
@@ -1870,7 +1870,7 @@ function LeadDetailView({ lead, onEdit, onDelete }: { lead: Lead; onEdit: () => 
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-brand-teal-light">Lead Status</p>
-            <h3 className="mt-2 truncate font-heading text-2xl font-normal sm:text-3xl">{lead.name}</h3>
+            <h3 className="mt-2 break-words font-heading text-2xl font-normal sm:text-3xl">{lead.name}</h3>
             <p className="mt-2 text-sm font-semibold text-white/58">{lead.interest}</p>
           </div>
           <StatusPill status={lead.status} />
@@ -1965,13 +1965,13 @@ function LeadField({
   type?: string;
 }) {
   return (
-    <label className="grid gap-1.5 text-sm font-extrabold text-brand-navy">
+    <label className="grid min-w-0 gap-1.5 text-sm font-extrabold text-brand-navy">
       {label}
       <input
         type={type}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="h-10 rounded-md border border-brand-navy/12 bg-surface-white px-3 text-sm font-semibold text-brand-navy outline-none transition focus:border-brand-teal focus:ring-4 focus:ring-brand-teal/10"
+        className="h-10 w-full min-w-0 rounded-md border border-brand-navy/12 bg-surface-white px-3 text-sm font-semibold text-brand-navy outline-none transition focus:border-brand-teal focus:ring-4 focus:ring-brand-teal/10"
       />
     </label>
   );
@@ -1989,12 +1989,12 @@ function LeadSelect({
   onChange: (value: string) => void;
 }) {
   return (
-    <label className="grid gap-1.5 text-sm font-extrabold text-brand-navy">
+    <label className="grid min-w-0 gap-1.5 text-sm font-extrabold text-brand-navy">
       {label}
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="h-10 rounded-md border border-brand-navy/12 bg-surface-white px-3 text-sm font-semibold text-brand-navy outline-none transition focus:border-brand-teal focus:ring-4 focus:ring-brand-teal/10"
+        className="h-10 w-full min-w-0 rounded-md border border-brand-navy/12 bg-surface-white px-3 text-sm font-semibold text-brand-navy outline-none transition focus:border-brand-teal focus:ring-4 focus:ring-brand-teal/10"
       >
         {options.map((option) => (
           <option key={option}>{option}</option>
@@ -2006,12 +2006,12 @@ function LeadSelect({
 
 function LeadTextarea({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
   return (
-    <label className="grid gap-1.5 text-sm font-extrabold text-brand-navy">
+    <label className="grid min-w-0 gap-1.5 text-sm font-extrabold text-brand-navy">
       {label}
       <textarea
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="min-h-24 rounded-md border border-brand-navy/12 bg-surface-white px-3 py-2.5 text-sm font-semibold leading-6 text-brand-navy outline-none transition focus:border-brand-teal focus:ring-4 focus:ring-brand-teal/10"
+        className="min-h-24 w-full min-w-0 rounded-md border border-brand-navy/12 bg-surface-white px-3 py-2.5 text-sm font-semibold leading-6 text-brand-navy outline-none transition focus:border-brand-teal focus:ring-4 focus:ring-brand-teal/10"
       />
     </label>
   );
@@ -2029,13 +2029,13 @@ function StudentField({
   type?: string;
 }) {
   return (
-    <label className="grid gap-1.5 text-sm font-extrabold text-brand-navy">
+    <label className="grid min-w-0 gap-1.5 text-sm font-extrabold text-brand-navy">
       {label}
       <input
         type={type}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="h-10 rounded-md border border-brand-navy/12 bg-surface-white px-3 text-sm font-semibold text-brand-navy outline-none transition focus:border-brand-teal focus:ring-4 focus:ring-brand-teal/10"
+        className="h-10 w-full min-w-0 rounded-md border border-brand-navy/12 bg-surface-white px-3 text-sm font-semibold text-brand-navy outline-none transition focus:border-brand-teal focus:ring-4 focus:ring-brand-teal/10"
       />
     </label>
   );
@@ -2053,12 +2053,12 @@ function StudentSelect({
   onChange: (value: string) => void;
 }) {
   return (
-    <label className="grid gap-1.5 text-sm font-extrabold text-brand-navy">
+    <label className="grid min-w-0 gap-1.5 text-sm font-extrabold text-brand-navy">
       {label}
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="h-10 rounded-md border border-brand-navy/12 bg-surface-white px-3 text-sm font-semibold text-brand-navy outline-none transition focus:border-brand-teal focus:ring-4 focus:ring-brand-teal/10"
+        className="h-10 w-full min-w-0 rounded-md border border-brand-navy/12 bg-surface-white px-3 text-sm font-semibold text-brand-navy outline-none transition focus:border-brand-teal focus:ring-4 focus:ring-brand-teal/10"
       >
         {options.map((option) => (
           <option key={option}>{option}</option>
@@ -2070,12 +2070,12 @@ function StudentSelect({
 
 function StudentTextarea({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
   return (
-    <label className="grid gap-1.5 text-sm font-extrabold text-brand-navy">
+    <label className="grid min-w-0 gap-1.5 text-sm font-extrabold text-brand-navy">
       {label}
       <textarea
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="min-h-24 rounded-md border border-brand-navy/12 bg-surface-white px-3 py-2.5 text-sm font-semibold leading-6 text-brand-navy outline-none transition focus:border-brand-teal focus:ring-4 focus:ring-brand-teal/10"
+        className="min-h-24 w-full min-w-0 rounded-md border border-brand-navy/12 bg-surface-white px-3 py-2.5 text-sm font-semibold leading-6 text-brand-navy outline-none transition focus:border-brand-teal focus:ring-4 focus:ring-brand-teal/10"
       />
     </label>
   );
