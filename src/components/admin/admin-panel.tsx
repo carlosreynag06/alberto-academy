@@ -60,6 +60,7 @@ type ActiveView =
   | "courses"
   | "materials"
   | "settings";
+type QuestionnaireSaveState = "idle" | "dirty" | "saving" | "saved" | "error";
 
 const navItems: { label: string; view: ActiveView; icon: typeof LayoutDashboard; enabled: boolean }[] = [
   { label: "Dashboard", view: "dashboard", icon: LayoutDashboard, enabled: true },
@@ -126,6 +127,8 @@ export function AdminPanel() {
   const [studentDraft, setStudentDraft] = useState<Student | null>(null);
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [questionnaireAnswers, setQuestionnaireAnswers] = useState<Record<number, string>>({});
+  const [questionnaireSaveState, setQuestionnaireSaveState] = useState<QuestionnaireSaveState>("idle");
+  const [questionnaireLastSavedAt, setQuestionnaireLastSavedAt] = useState<string | null>(null);
   const [leadMode, setLeadMode] = useState<"add" | "edit">("edit");
   const [studentMode, setStudentMode] = useState<"add" | "edit">("edit");
   const [syncMessage, setSyncMessage] = useState<string | null>(() =>
@@ -162,6 +165,7 @@ export function AdminPanel() {
           const backendQuestionnaireAnswers = await listQuestionnaireAnswers(accessToken);
           if (isCancelled) return;
           setQuestionnaireAnswers(backendQuestionnaireAnswers);
+          setQuestionnaireSaveState("idle");
         } catch (error) {
           console.error(error);
         }
@@ -277,6 +281,11 @@ export function AdminPanel() {
     if (!selectedStudent) return;
     setStudentMode("edit");
     setStudentDraft(selectedStudent);
+  }
+
+  function updateQuestionnaireAnswer(questionId: number, answer: string) {
+    setQuestionnaireAnswers((current) => ({ ...current, [questionId]: answer }));
+    setQuestionnaireSaveState("dirty");
   }
 
   async function saveLead() {
@@ -405,10 +414,14 @@ export function AdminPanel() {
     }
 
     try {
+      setQuestionnaireSaveState("saving");
       await saveQuestionnaireAnswers(questionnaireAnswers, accessToken);
+      setQuestionnaireSaveState("saved");
+      setQuestionnaireLastSavedAt(new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }));
       setSyncMessage("Questionnaire saved to Supabase");
     } catch (error) {
       console.error(error);
+      setQuestionnaireSaveState("error");
       setSyncMessage("Could not save questionnaire answers");
     }
   }
@@ -513,9 +526,14 @@ export function AdminPanel() {
                   <p className="rounded-md border border-brand-navy/10 bg-surface-cream px-3 py-2 text-center text-xs font-extrabold text-brand-navy/58">
                     {questionnaireCompleted}/{questionnaireQuestionCount} completadas
                   </p>
-                  <button type="button" onClick={saveQuestionnaire} className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-brand-red px-4 text-sm font-extrabold text-white transition hover:bg-brand-red-dark sm:h-11">
+                  <button
+                    type="button"
+                    onClick={saveQuestionnaire}
+                    disabled={questionnaireSaveState === "saving"}
+                    className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-brand-red px-4 text-sm font-extrabold text-white transition hover:bg-brand-red-dark disabled:cursor-not-allowed disabled:opacity-60 sm:h-11"
+                  >
                     <Save size={17} aria-hidden />
-                    Guardar respuestas
+                    {questionnaireSaveState === "saving" ? "Guardando..." : "Guardar respuestas"}
                   </button>
                 </div>
               ) : activeView === "student-detail" && selectedStudent ? (
@@ -604,9 +622,9 @@ export function AdminPanel() {
               <QuestionnaireView
                 answers={questionnaireAnswers}
                 completed={questionnaireCompleted}
-                onAnswerChange={(questionId, answer) =>
-                  setQuestionnaireAnswers((current) => ({ ...current, [questionId]: answer }))
-                }
+                saveState={questionnaireSaveState}
+                lastSavedAt={questionnaireLastSavedAt}
+                onAnswerChange={updateQuestionnaireAnswer}
                 onSave={saveQuestionnaire}
               />
             )}
@@ -881,11 +899,15 @@ function Dashboard({
 function QuestionnaireView({
   answers,
   completed,
+  saveState,
+  lastSavedAt,
   onAnswerChange,
   onSave,
 }: {
   answers: Record<number, string>;
   completed: number;
+  saveState: QuestionnaireSaveState;
+  lastSavedAt: string | null;
   onAnswerChange: (questionId: number, answer: string) => void;
   onSave: () => void;
 }) {
@@ -901,6 +923,24 @@ function QuestionnaireView({
       block: "start",
     });
   }
+
+  const saveMessage =
+    saveState === "saving"
+      ? "Guardando..."
+      : saveState === "saved"
+        ? `Cambios guardados${lastSavedAt ? ` a las ${lastSavedAt}` : ""}`
+        : saveState === "dirty"
+          ? "Cambios sin guardar"
+          : saveState === "error"
+            ? "No se pudo guardar. Intenta otra vez."
+            : "Listo para guardar";
+
+  const saveMessageClass =
+    saveState === "saved"
+      ? "border-brand-teal/24 bg-brand-teal/12 text-brand-blue"
+      : saveState === "error"
+        ? "border-brand-red/24 bg-brand-red/10 text-brand-red"
+        : "border-brand-navy/10 bg-surface-cream text-brand-navy/58";
 
   return (
     <div className="grid gap-4 xl:grid-cols-[17rem_1fr] xl:gap-5">
@@ -962,10 +1002,19 @@ function QuestionnaireView({
                 Información real para escribir una web que sí represente el negocio.
               </h2>
             </div>
-            <div className="flex shrink-0 sm:justify-end lg:pt-9">
-              <button type="button" onClick={onSave} className="inline-flex h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-brand-red px-5 text-sm font-extrabold text-white transition hover:bg-brand-red-dark sm:w-auto">
+            <div className="grid shrink-0 gap-2 sm:grid-cols-[auto_auto] sm:items-center lg:pt-9">
+              <p className={`inline-flex h-9 items-center justify-center gap-2 rounded-md border px-3 text-xs font-extrabold ${saveMessageClass}`}>
+                {saveState === "saved" && <CheckCircle2 size={15} aria-hidden />}
+                {saveMessage}
+              </p>
+              <button
+                type="button"
+                onClick={onSave}
+                disabled={saveState === "saving"}
+                className="inline-flex h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-brand-red px-5 text-sm font-extrabold text-white transition hover:bg-brand-red-dark disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+              >
                 <Save size={17} aria-hidden />
-                Guardar respuestas
+                {saveState === "saving" ? "Guardando..." : "Guardar respuestas"}
               </button>
             </div>
           </div>
@@ -1012,6 +1061,16 @@ function QuestionnaireView({
                       placeholder="Respuesta de Alberto..."
                       className="min-h-28 resize-y rounded-md border border-brand-navy/12 bg-surface-white px-3 py-3 text-sm font-semibold leading-6 text-brand-navy outline-none transition placeholder:text-brand-navy/32 focus:border-brand-teal focus:ring-4 focus:ring-brand-teal/10"
                     />
+                    {(answers[question.id] ?? "").trim().length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => onAnswerChange(question.id, "")}
+                        className="inline-flex h-9 w-fit items-center justify-center gap-2 rounded-md border border-brand-red/20 px-3 text-xs font-extrabold text-brand-red transition hover:bg-brand-red hover:text-white"
+                      >
+                        <Trash2 size={15} aria-hidden />
+                        Borrar respuesta
+                      </button>
+                    )}
                   </label>
                 ))}
               </div>
