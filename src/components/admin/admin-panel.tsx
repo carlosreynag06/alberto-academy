@@ -909,9 +909,6 @@ function QuestionnaireView({
           <div className="p-4 sm:p-5">
             <p className="section-kicker-dark">Brief de contenido</p>
             <h2 className="mt-2 font-heading text-2xl font-normal leading-tight">Cuestionario</h2>
-            <p className="mt-3 text-sm font-semibold leading-6 text-white/62">
-              Responde con calma. Cada respuesta queda guardada en Supabase para convertirla luego en copy real.
-            </p>
           </div>
 
           <div className="border-y border-white/10 p-4 sm:p-5">
@@ -958,15 +955,15 @@ function QuestionnaireView({
 
       <section className="grid gap-4">
         <div className="rounded-xl border border-brand-navy/10 bg-surface-white p-4 shadow-xl shadow-brand-navy/6 sm:p-5">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-3xl">
               <p className="section-kicker">105 Preguntas</p>
-              <h2 className="mt-1 font-heading text-3xl font-normal leading-tight sm:text-4xl">
+              <h2 className="mt-1 max-w-[42rem] font-heading text-3xl font-normal leading-tight sm:text-4xl">
                 Información real para escribir una web que sí represente el negocio.
               </h2>
             </div>
-            <div className="flex sm:justify-end">
-              <button type="button" onClick={onSave} className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-brand-red px-5 text-sm font-extrabold text-white transition hover:bg-brand-red-dark sm:w-auto sm:min-w-52">
+            <div className="flex shrink-0 sm:justify-end lg:pt-9">
+              <button type="button" onClick={onSave} className="inline-flex h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-brand-red px-5 text-sm font-extrabold text-white transition hover:bg-brand-red-dark sm:w-auto">
                 <Save size={17} aria-hidden />
                 Guardar respuestas
               </button>
