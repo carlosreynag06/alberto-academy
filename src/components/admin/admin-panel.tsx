@@ -899,7 +899,7 @@ function Dashboard({
   );
 }
 
-function createQuestionnairePdf(answers: Record<number, string>, completed: number) {
+function createQuestionnairePdf(answers: Record<number, string>) {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -908,9 +908,13 @@ function createQuestionnairePdf(answers: Record<number, string>, completed: numb
   const bottomLimit = pageHeight - 72;
   const navy = "#132440";
   const red = "#BF092F";
-  const blue = "#16476A";
   const muted = "#64748B";
   const line = "#D8D4CA";
+  const generatedAt = new Date().toLocaleDateString("es-DO", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
   let y = margin;
 
   function addFooter() {
@@ -922,58 +926,39 @@ function createQuestionnairePdf(answers: Record<number, string>, completed: numb
       doc.setFont("helvetica", "normal");
       doc.setFontSize(8.5);
       doc.setTextColor(muted);
-      doc.text("Alberto Academy - Cuestionario de contenido", margin, pageHeight - 28);
+      doc.text(`Alberto Academy - Cuestionario de contenido - Generado: ${generatedAt}`, margin, pageHeight - 28);
       doc.text(String(page).padStart(2, "0"), pageWidth - margin, pageHeight - 28, { align: "right" });
     }
   }
 
-  function addCover() {
+  function addDocumentHeading() {
     doc.setFillColor(navy);
     doc.rect(0, 0, 12, pageHeight, "F");
     doc.setFillColor(red);
-    doc.roundedRect(margin, margin, 46, 46, 8, 8, "F");
+    doc.roundedRect(margin, margin, 38, 38, 7, 7, "F");
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(20);
+    doc.setFontSize(17);
     doc.setTextColor("#FFFFFF");
-    doc.text("A", margin + 23, margin + 30, { align: "center" });
+    doc.text("A", margin + 19, margin + 25, { align: "center" });
 
     doc.setTextColor(navy);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(13);
-    doc.text("ALBERTO ACADEMY", margin + 64, margin + 17);
+    doc.setFontSize(12);
+    doc.text("ALBERTO ACADEMY", margin + 54, margin + 15);
     doc.setTextColor(red);
-    doc.setFontSize(9);
-    doc.text("CUESTIONARIO DE CONTENIDO", margin + 64, margin + 34);
-
-    doc.setTextColor(navy);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(31);
-    doc.text("Respuestas para construir", margin, 190);
-    doc.text("el copy real del sitio.", margin, 228);
-
-    doc.setDrawColor(line);
-    doc.line(margin, 266, pageWidth - margin, 266);
-
-    doc.setTextColor(muted);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(11);
-    const generatedAt = new Date().toLocaleDateString("es-DO", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-    doc.text(`Generado: ${generatedAt}`, margin, 304);
-    doc.text(`${completed}/${questionnaireQuestionCount} preguntas respondidas`, margin, 324);
-
-    doc.setTextColor(blue);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(10);
-    doc.text("Documento organizado por las categorías originales del cuestionario.", margin, 370);
+    doc.setFontSize(8.5);
+    doc.text("CUESTIONARIO DE CONTENIDO", margin + 54, margin + 31);
   }
 
   function startSectionPage(sectionTitle: string, sectionIndex: number, continued = false) {
-    doc.addPage();
+    if (doc.getNumberOfPages() > 1 || sectionIndex > 1 || continued) {
+      doc.addPage();
+    }
     y = margin;
+    if (sectionIndex === 1 && !continued) {
+      addDocumentHeading();
+      y += 78;
+    }
     doc.setTextColor(red);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9.5);
@@ -992,8 +977,6 @@ function createQuestionnairePdf(answers: Record<number, string>, completed: numb
       startSectionPage(sectionTitle, sectionIndex, true);
     }
   }
-
-  addCover();
 
   questionnaireSections.forEach((section, sectionIndex) => {
     startSectionPage(section.title, sectionIndex + 1);
@@ -1084,7 +1067,7 @@ function QuestionnaireView({
           ? "Cambios sin guardar"
           : saveState === "error"
             ? "No se pudo guardar. Intenta otra vez."
-            : "Listo para guardar";
+            : null;
 
   const saveMessageClass =
     saveState === "saved"
@@ -1094,7 +1077,7 @@ function QuestionnaireView({
         : "border-brand-navy/10 bg-surface-cream text-brand-navy/58";
 
   function openPdfPreview() {
-    const blob = createQuestionnairePdf(answers, completed);
+    const blob = createQuestionnairePdf(answers);
     const nextUrl = URL.createObjectURL(blob);
     if (pdfPreviewUrl) {
       URL.revokeObjectURL(pdfPreviewUrl);
@@ -1169,15 +1152,11 @@ function QuestionnaireView({
                 Información real para escribir una web que sí represente el negocio.
               </h2>
             </div>
-            <div className="grid min-w-0 shrink-0 gap-2 sm:grid-cols-[auto_auto_auto] sm:items-center lg:pt-9">
-              <p className={`inline-flex min-h-9 items-center justify-center gap-2 rounded-md border px-3 py-2 text-center text-xs font-extrabold ${saveMessageClass}`}>
-                {saveState === "saved" && <CheckCircle2 size={15} aria-hidden />}
-                {saveMessage}
-              </p>
+            <div className="grid min-w-0 shrink-0 gap-2 sm:grid-cols-2 sm:items-center lg:pt-9">
               <button
                 type="button"
                 onClick={openPdfPreview}
-                className="inline-flex h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md border border-brand-navy/12 bg-surface-cream px-5 text-sm font-extrabold text-brand-navy transition hover:border-brand-teal hover:bg-surface-white sm:w-auto"
+                className="inline-flex h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-brand-blue px-5 text-sm font-extrabold text-white transition hover:bg-brand-navy sm:w-auto"
               >
                 <Eye size={17} aria-hidden />
                 Vista previa PDF
@@ -1191,6 +1170,12 @@ function QuestionnaireView({
                 <Save size={17} aria-hidden />
                 {saveState === "saving" ? "Guardando..." : "Guardar respuestas"}
               </button>
+              {saveMessage && (
+                <p className={`inline-flex min-h-9 items-center justify-center gap-2 rounded-md border px-3 py-2 text-center text-xs font-extrabold sm:col-span-2 ${saveMessageClass}`}>
+                  {saveState === "saved" && <CheckCircle2 size={15} aria-hidden />}
+                  {saveMessage}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -1240,7 +1225,7 @@ function QuestionnaireView({
                       <button
                         type="button"
                         onClick={() => onAnswerChange(question.id, "")}
-                        className="inline-flex h-9 w-fit items-center justify-center gap-2 rounded-md border border-brand-red/20 px-3 text-xs font-extrabold text-brand-red transition hover:bg-brand-red hover:text-white"
+                        className="inline-flex h-9 w-fit items-center justify-center gap-2 rounded-md bg-brand-red px-3 text-xs font-extrabold text-white transition hover:bg-brand-red-dark"
                       >
                         <Trash2 size={15} aria-hidden />
                         Borrar respuesta
