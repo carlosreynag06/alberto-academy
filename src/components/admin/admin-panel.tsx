@@ -524,22 +524,7 @@ export function AdminPanel() {
                 </h1>
                 {syncMessage && <p className="mt-1 text-xs font-bold text-brand-navy/46">{syncMessage}</p>}
               </div>
-              {activeView === "questionnaire" ? (
-                <div className="grid gap-2 sm:grid-cols-[auto_auto] md:w-auto md:items-center">
-                  <p className="rounded-md border border-brand-navy/10 bg-surface-cream px-3 py-2 text-center text-xs font-extrabold text-brand-navy/58">
-                    {questionnaireCompleted}/{questionnaireQuestionCount} completadas
-                  </p>
-                  <button
-                    type="button"
-                    onClick={saveQuestionnaire}
-                    disabled={questionnaireSaveState === "saving"}
-                    className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-brand-red px-4 text-sm font-extrabold text-white transition hover:bg-brand-red-dark disabled:cursor-not-allowed disabled:opacity-60 sm:h-11"
-                  >
-                    <Save size={17} aria-hidden />
-                    {questionnaireSaveState === "saving" ? "Guardando..." : "Guardar respuestas"}
-                  </button>
-                </div>
-              ) : activeView === "student-detail" && selectedStudent ? (
+              {activeView === "questionnaire" ? null : activeView === "student-detail" && selectedStudent ? (
                 <div className="grid gap-2 sm:grid-cols-2 md:w-auto">
                   <button type="button" onClick={returnToStudents} className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-brand-navy/12 bg-surface-cream px-4 text-sm font-extrabold text-brand-navy transition hover:border-brand-teal hover:bg-surface-white sm:h-11">
                     <ArrowLeft size={17} aria-hidden />
