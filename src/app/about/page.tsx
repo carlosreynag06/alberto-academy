@@ -71,22 +71,22 @@ const values = [
 
 const journey = [
   {
-    year: "2017",
+    year: "2022",
     title: "Classroom teaching foundation",
     copy: "Began teaching English in private-school settings, building a strong foundation in classroom management, pronunciation support, and practical ESL instruction.",
   },
   {
-    year: "2019",
+    year: "2023",
     title: "Direct Method specialization",
-    copy: "Completed focused training in communicative teaching techniques and began refining a direct, English-first approach for Spanish-speaking learners.",
+    copy: "Deepened his communicative teaching practice and began refining a direct, English-first approach for Spanish-speaking learners.",
   },
   {
-    year: "2021",
+    year: "2025",
     title: "CONNECT course development",
-    copy: "Designed the CONNECT course series to help adult learners move from grammar knowledge to structured, confident conversation.",
+    copy: "Developed the CONNECT course series to help adult learners move from grammar knowledge to structured, confident conversation.",
   },
   {
-    year: "2024",
+    year: "2026",
     title: "Speak Up English launch",
     copy: "Expanded Alberto Academy with interactive resources, writing support, and online tutoring paths for academic and career goals.",
   },
