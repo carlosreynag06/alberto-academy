@@ -170,10 +170,10 @@ function About() {
           <div className="relative min-h-[360px] rounded-xl border border-brand-navy/14 bg-transparent p-2 shadow-2xl shadow-brand-navy/12 sm:min-h-[460px] sm:p-3 lg:h-full lg:min-h-0">
             <div className="image-sheen relative h-full min-h-[344px] overflow-hidden rounded-lg bg-brand-navy sm:min-h-[436px] lg:min-h-0">
               <Image
-                src="/images/alberto-portrait.webp"
+                src="/images/alberto-portrait-original.jpeg"
                 alt="Alberto Sosa, ESL educator and course developer"
                 fill
-                quality={95}
+                quality={82}
                 sizes="(min-width: 1180px) 500px, (min-width: 1024px) 42vw, 100vw"
                 className="object-cover object-[center_16%]"
               />
