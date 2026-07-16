@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 };
 
 const academyStats = [
-  { value: "8+", label: "Years teaching ESL" },
+  { value: "4", label: "Years teaching ESL" },
   { value: "200+", label: "Students taught" },
   { value: "4", label: "Course levels" },
   { value: "2", label: "Original course series" },
@@ -206,7 +206,7 @@ function AcademyIntro() {
             </div>
           </div>
           <div className="absolute -right-4 top-8 hidden rounded-lg bg-brand-red px-5 py-4 text-white shadow-xl shadow-brand-red/20 md:block">
-            <p className="font-heading text-3xl font-normal">8+</p>
+            <p className="font-heading text-3xl font-normal">4</p>
             <p className="text-xs font-bold uppercase text-white/72">Years Teaching</p>
           </div>
         </MotionImagePanel>

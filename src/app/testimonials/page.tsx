@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 
 const pageStats = [
   { value: "200+", label: "Students taught" },
-  { value: "8+", label: "Years teaching" },
+  { value: "4", label: "Years teaching" },
   { value: "4", label: "Course levels" },
   { value: "3", label: "Focused tracks" },
 ];
