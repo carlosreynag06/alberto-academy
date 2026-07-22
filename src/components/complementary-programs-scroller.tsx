@@ -1,77 +1,127 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, BookOpenCheck, BriefcaseBusiness, CheckCircle2, PenLine } from "lucide-react";
-import { programTracks } from "@/lib/programs";
 
-const complementaryIds = ["programa-por-niveles", "tutorias-personalizadas", "coaching-especializado"];
-const complementaryPrograms = programTracks.filter((program) => complementaryIds.includes(program.id));
-const icons = [BookOpenCheck, PenLine, BriefcaseBusiness];
+const complementaryPrograms = [
+  {
+    id: "programa-por-niveles",
+    eyebrow: "Avance progresivo",
+    title: "Programa de inglés por niveles",
+    summary: "Construya una base sólida y avance con una ruta clara.",
+    detail: "Conversación, comprensión auditiva, lectura y escritura en una secuencia de cuatro niveles.",
+    highlights: ["4 niveles", "14 módulos por nivel", "Evaluación continua"],
+    icon: BookOpenCheck,
+  },
+  {
+    id: "tutorias-personalizadas",
+    eyebrow: "Apoyo puntual",
+    title: "Tutorías personalizadas",
+    summary: "Resuelva una dificultad concreta sin comenzar otro programa.",
+    detail: "Refuerce un tema, una asignación, un texto o una presentación con orientación directa.",
+    highlights: ["Horario flexible", "Enfoque específico", "Práctica dirigida"],
+    icon: PenLine,
+  },
+  {
+    id: "coaching-especializado",
+    eyebrow: "Meta específica",
+    title: "Coaching especializado",
+    summary: "Prepárese para ese momento importante con práctica enfocada.",
+    detail: "Entrevistas, exámenes, negocios, viajes o pronunciación trabajados desde su contexto real.",
+    highlights: ["Plan a medida", "Vocabulario relevante", "Feedback directo"],
+    icon: BriefcaseBusiness,
+  },
+];
 
 export function ComplementaryProgramsScroller() {
   const scrollerRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
 
-  function move(direction: -1 | 1) {
+  function goTo(index: number) {
+    const nextIndex = Math.min(Math.max(index, 0), complementaryPrograms.length - 1);
+    const scroller = scrollerRef.current;
+    const target = scroller?.children.item(nextIndex) as HTMLElement | null;
+
+    if (!scroller || !target) return;
+    scroller.scrollTo({ left: target.offsetLeft, behavior: "smooth" });
+    setActiveIndex(nextIndex);
+  }
+
+  function syncActiveCard() {
     const scroller = scrollerRef.current;
     if (!scroller) return;
 
-    scroller.scrollBy({ left: direction * Math.max(scroller.clientWidth * 0.72, 300), behavior: "smooth" });
+    const cards = Array.from(scroller.children) as HTMLElement[];
+    const nearestIndex = cards.reduce((nearest, card, index) => {
+      const currentDistance = Math.abs(card.offsetLeft - scroller.scrollLeft);
+      const nearestDistance = Math.abs(cards[nearest].offsetLeft - scroller.scrollLeft);
+      return currentDistance < nearestDistance ? index : nearest;
+    }, 0);
+
+    setActiveIndex(nearestIndex);
   }
 
   return (
     <section id="rutas-complementarias" className="overflow-hidden bg-brand-navy px-4 py-16 text-white sm:px-6 sm:py-20 lg:px-8 lg:py-24">
       <div className="mx-auto max-w-6xl">
-        <div className="grid gap-7 border-b border-white/14 pb-8 lg:grid-cols-[1fr_auto] lg:items-end">
-          <div className="max-w-3xl">
+        <div className="flex flex-col gap-7 border-b border-white/14 pb-8 sm:flex-row sm:items-end sm:justify-between">
+          <div className="max-w-2xl">
             <p className="section-kicker-dark">Rutas complementarias</p>
-            <h2 className="section-heading mt-3 text-white">Más opciones para avanzar según su objetivo.</h2>
-            <p className="mt-5 max-w-2xl leading-7 text-white/66">
-              Explore una ruta completa por niveles, apoyo puntual o preparación para una meta específica.
-            </p>
+            <h2 className="section-heading mt-3 text-white">Una opción a la vez. Elija la que responda a su meta.</h2>
           </div>
-          <div className="flex gap-2" aria-label="Controles del carrusel">
-            <button type="button" onClick={() => move(-1)} className="grid size-12 place-items-center rounded-full border border-white/22 text-white transition hover:border-brand-teal-light hover:bg-brand-teal hover:text-white" aria-label="Ver servicio anterior">
-              <ArrowLeft size={20} aria-hidden />
-            </button>
-            <button type="button" onClick={() => move(1)} className="grid size-12 place-items-center rounded-full bg-brand-red text-white transition hover:bg-brand-red-dark" aria-label="Ver servicio siguiente">
-              <ArrowRight size={20} aria-hidden />
-            </button>
+
+          <div className="flex items-center gap-4">
+            <p className="min-w-14 text-center text-sm font-extrabold tracking-[0.12em] text-white/58" aria-live="polite">
+              {String(activeIndex + 1).padStart(2, "0")} / {String(complementaryPrograms.length).padStart(2, "0")}
+            </p>
+            <div className="flex gap-2" aria-label="Controles del carrusel">
+              <button type="button" onClick={() => goTo(activeIndex - 1)} disabled={activeIndex === 0} className="grid size-12 place-items-center rounded-full border border-white/22 text-white transition hover:border-brand-teal-light hover:bg-brand-teal disabled:cursor-not-allowed disabled:opacity-30" aria-label="Ver servicio anterior">
+                <ArrowLeft size={20} aria-hidden />
+              </button>
+              <button type="button" onClick={() => goTo(activeIndex + 1)} disabled={activeIndex === complementaryPrograms.length - 1} className="grid size-12 place-items-center rounded-full bg-brand-red text-white transition hover:bg-brand-red-dark disabled:cursor-not-allowed disabled:opacity-30" aria-label="Ver servicio siguiente">
+                <ArrowRight size={20} aria-hidden />
+              </button>
+            </div>
           </div>
         </div>
 
-        <div ref={scrollerRef} className="mt-8 grid snap-x snap-mandatory grid-flow-col auto-cols-[88%] gap-4 overflow-x-auto overscroll-x-contain pb-4 sm:auto-cols-[66%] lg:auto-cols-[46%] xl:auto-cols-[38%]" tabIndex={0} aria-label="Servicios complementarios">
+        <div ref={scrollerRef} onScroll={syncActiveCard} className="mt-8 flex snap-x snap-mandatory gap-6 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" tabIndex={0} aria-label="Servicios complementarios">
           {complementaryPrograms.map((program, index) => {
-            const Icon = icons[index] ?? BookOpenCheck;
+            const Icon = program.icon;
 
             return (
-              <article key={program.id} id={program.id} className="flex min-h-[31rem] snap-start flex-col rounded-xl border border-brand-navy/10 bg-surface-white p-6 text-brand-navy shadow-2xl shadow-black/14 sm:p-7">
-                <div className="flex items-start justify-between gap-4">
-                  <span className="grid size-11 place-items-center rounded-lg bg-brand-navy text-white"><Icon size={21} strokeWidth={1.8} aria-hidden /></span>
-                  <span className="font-heading text-4xl font-normal leading-none text-brand-navy/14">{String(index + 1).padStart(2, "0")}</span>
-                </div>
+              <article key={program.id} id={program.id} className="min-w-full snap-start overflow-hidden rounded-xl bg-surface-white text-brand-navy shadow-2xl shadow-black/16">
+                <div className="grid min-h-[25rem] md:grid-cols-[0.42fr_0.58fr]">
+                  <div className="relative isolate flex min-h-[15rem] flex-col justify-between overflow-hidden bg-brand-blue p-6 text-white sm:p-8 md:min-h-full lg:p-10">
+                    <div className="orbital-grid absolute inset-0 opacity-[0.08]" />
+                    <div className="relative flex items-start justify-between">
+                      <span className="grid size-12 place-items-center rounded-lg bg-brand-teal text-white"><Icon size={23} strokeWidth={1.8} aria-hidden /></span>
+                      <span className="font-heading text-5xl font-normal leading-none text-white/16">{String(index + 1).padStart(2, "0")}</span>
+                    </div>
+                    <div className="relative mt-10">
+                      <p className="text-xs font-extrabold uppercase tracking-[0.1em] text-brand-teal-light">{program.eyebrow}</p>
+                      <h3 className="mt-3 max-w-md font-heading text-3xl font-normal leading-tight sm:text-4xl">{program.title}</h3>
+                    </div>
+                  </div>
 
-                <p className="mt-6 text-xs font-extrabold uppercase tracking-[0.09em] text-brand-red">{program.eyebrow}</p>
-                <h3 className="mt-3 font-heading text-3xl font-normal leading-tight">{program.title}</h3>
-                <p className="mt-4 font-heading text-xl font-normal leading-snug text-brand-blue">{program.headline}</p>
-                <p className="mt-4 text-sm leading-7 text-brand-navy/64">{program.description}</p>
+                  <div className="flex flex-col justify-center p-6 sm:p-8 lg:p-10">
+                    <p className="max-w-xl font-heading text-2xl font-normal leading-snug text-brand-blue sm:text-3xl">{program.summary}</p>
+                    <p className="mt-4 max-w-xl text-sm leading-7 text-brand-navy/64 sm:text-base">{program.detail}</p>
 
-                <div className="mt-6 grid gap-3 border-t border-brand-navy/10 pt-5">
-                  {program.outcomes.slice(0, 3).map((outcome) => (
-                    <p key={outcome} className="flex items-center gap-2 text-sm font-bold text-brand-navy/72">
-                      <CheckCircle2 size={15} className="shrink-0 text-brand-teal" aria-hidden />
-                      {outcome}
-                    </p>
-                  ))}
-                </div>
+                    <div className="mt-7 grid gap-3 border-y border-brand-navy/10 py-5 sm:grid-cols-3">
+                      {program.highlights.map((highlight) => (
+                        <p key={highlight} className="flex items-center gap-2 text-sm font-bold text-brand-navy/72">
+                          <CheckCircle2 size={15} className="shrink-0 text-brand-teal" aria-hidden />
+                          {highlight}
+                        </p>
+                      ))}
+                    </div>
 
-                <div className="mt-auto pt-7">
-                  <p className="border-t border-brand-navy/10 pt-5 text-xs font-extrabold uppercase leading-6 tracking-[0.07em] text-brand-navy/48">
-                    {program.badge} · {program.format} · {program.focus}
-                  </p>
-                  <Link href="/contact" className="mt-5 inline-flex items-center gap-2 text-sm font-extrabold text-brand-red transition hover:text-brand-red-dark">
-                    Consultar esta opción <ArrowRight size={17} aria-hidden />
-                  </Link>
+                    <Link href="/contact" className="mt-7 inline-flex w-fit items-center gap-2 text-sm font-extrabold text-brand-red transition hover:text-brand-red-dark">
+                      Consultar esta opción <ArrowRight size={17} aria-hidden />
+                    </Link>
+                  </div>
                 </div>
               </article>
             );
