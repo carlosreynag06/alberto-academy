@@ -6,7 +6,7 @@ export const navItems = [
   { label: "Inicio", href: "/" },
   { label: "Alberto", href: "/about" },
   { label: "Programas", href: "/programs#programs-hero" },
-  { label: "Resultados", href: "/testimonials" },
+  { label: "Testimonios", href: "/testimonials" },
   { label: "Precios", href: "/pricing" },
   { label: "Acceso", href: "/login" },
 ];

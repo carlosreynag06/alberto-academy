@@ -5,7 +5,7 @@ import { MotionArticle, MotionImagePanel, MotionReveal } from "@/components/moti
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { homepageFaqs } from "@/lib/faqs";
 import { programTracks } from "@/lib/programs";
-import { ArrowRight, BookOpenCheck, CalendarCheck, CheckCircle2, ChevronRight, Compass, GraduationCap, MessagesSquare, ShieldCheck, Target, Users, Video } from "lucide-react";
+import { ArrowRight, BookOpenCheck, CalendarCheck, CheckCircle2, ChevronRight, Compass, GraduationCap, MessagesSquare, Quote, ShieldCheck, Star, Target, Users } from "lucide-react";
 
 const stats = [
   { value: "4+", label: "Años de experiencia" },
@@ -29,10 +29,25 @@ const learningPath = [
   { step: "04", title: "Clases y seguimiento", copy: "Avanza con práctica guiada, corrección respetuosa, tareas cuando corresponda y revisiones cada dos unidades." },
 ];
 
-const observedResults = [
-  { title: "Hablar con menos miedo", copy: "Estudiantes que antes evitaban expresarse han ganado seguridad para participar y comunicarse.", icon: MessagesSquare },
-  { title: "Sostener conversaciones más largas", copy: "Una base mayor de vocabulario y práctica contextual permite responder con más continuidad.", icon: Video },
-  { title: "Avanzar hacia metas concretas", copy: "La enseñanza ha apoyado graduaciones, exámenes, entrevistas, trabajo y mejora académica.", icon: Target },
+const stories = [
+  {
+    name: "Mariana R.",
+    role: "Marketing professional",
+    quote: "I stopped translating in my head during meetings. Alberto helped me speak with structure and confidence.",
+    result: "Promotion interview passed",
+  },
+  {
+    name: "Daniel P.",
+    role: "University applicant",
+    quote: "The lessons were practical and focused. My writing improved, but my speaking improved even faster.",
+    result: "IELTS speaking band +1.5",
+  },
+  {
+    name: "Sofia L.",
+    role: "High school student",
+    quote: "I used to avoid speaking English. Now I participate more, ask questions, and enjoy class.",
+    result: "Top grade in English",
+  },
 ];
 
 export default function Home() {
@@ -44,7 +59,7 @@ export default function Home() {
       <Programs />
       <Philosophy />
       <LearningPath />
-      <Results />
+      <SuccessStories />
       <FAQ />
       <FinalCTA />
       <SiteFooter />
@@ -62,7 +77,7 @@ function Hero() {
       <div className="section-container relative z-10 grid min-w-0 px-4 py-16 sm:px-8 sm:py-20 md:py-24 lg:px-10 lg:py-28">
         <MotionReveal className="min-w-0 max-w-3xl" y={18}>
           <p className="section-kicker-dark">Academia de idiomas online</p>
-          <h1 className="hero-heading mt-4 max-w-3xl text-white">Hable inglés con seguridad, no con miedo.</h1>
+          <h1 className="hero-heading mt-4 max-w-3xl text-white">Hable Inglés con Confianza</h1>
           <p className="mt-5 max-w-2xl text-base leading-7 text-white/76 sm:mt-6 sm:text-lg sm:leading-8">
             Construya vocabulario útil, comprenda el idioma en contexto y practique conversaciones reales con un método directo, progresivo y guiado por Alberto A. Sosa.
           </p>
@@ -175,15 +190,69 @@ function LearningPath() {
   );
 }
 
-function Results() {
+function SuccessStories() {
   return (
-    <section className="section-pad bg-surface-cream">
+    <section id="success-stories" className="section-pad bg-surface-cream">
       <div className="section-container">
-        <MotionReveal className="mx-auto max-w-3xl text-center"><p className="section-kicker">Resultados observados</p><h2 className="section-heading mt-3">El progreso no es una promesa vacía. Es una práctica constante.</h2><p className="body-copy-lg mt-5">Alberto no promete resultados automáticos. Sí aporta método, corrección y seguimiento para que el esfuerzo de cada estudiante tenga dirección.</p></MotionReveal>
-        <div className="mt-10 grid gap-4 md:grid-cols-3">
-          {observedResults.map((item, index) => { const Icon = item.icon; return <MotionArticle key={item.title} delay={index * 0.08} className="rounded-xl border border-brand-navy/10 bg-surface-white p-6 shadow-xl shadow-brand-navy/6"><div className="grid size-11 place-items-center rounded-lg bg-brand-blue text-white"><Icon size={21} aria-hidden /></div><h3 className="mt-5 font-heading text-2xl font-normal">{item.title}</h3><p className="mt-3 text-sm leading-7 text-brand-navy/66">{item.copy}</p></MotionArticle>; })}
+        <MotionReveal className="mx-auto max-w-2xl text-center">
+          <p className="section-kicker">Success Stories</p>
+          <h2 className="section-heading mt-3">Student progress, in their own words.</h2>
+        </MotionReveal>
+        <div className="testimonial-board mx-auto mt-10 max-w-6xl">
+          <MotionArticle className="testimonial-feature overflow-hidden rounded-xl border border-brand-navy/10 bg-brand-navy text-white shadow-2xl shadow-brand-navy/12">
+            <div className="testimonial-feature-image relative overflow-hidden bg-brand-blue">
+              <Image
+                src="/images/confident-dominican-female-student.webp"
+                alt="Confident Dominican female student after improving English fluency"
+                fill
+                quality={82}
+                sizes="(min-width: 1180px) 430px, (min-width: 1024px) 31vw, (min-width: 768px) 38vw, 100vw"
+                className="object-cover object-[50%_38%]"
+              />
+              <div className="absolute inset-0 bg-brand-navy/18" />
+            </div>
+            <div className="testimonial-feature-copy flex min-w-0 flex-col justify-between p-6 sm:p-7">
+              <div>
+                <Quote size={28} className="text-brand-teal-light" aria-hidden />
+                <p className="mt-5 max-w-2xl font-heading text-[1.25rem] font-normal leading-[1.2] sm:text-[1.48rem] lg:text-[1.58rem]">
+                  {stories[0].quote}
+                </p>
+              </div>
+              <div className="mt-5 flex flex-col gap-3 border-t border-white/12 pt-4">
+                <div>
+                  <p className="font-heading text-xl font-normal">{stories[0].name}</p>
+                  <p className="mt-1 text-sm text-white/58">{stories[0].role}</p>
+                </div>
+                <p className="inline-flex w-fit items-center gap-2 rounded-md bg-brand-red px-3 py-2 text-sm font-bold text-white">
+                  <Star size={15} fill="currentColor" aria-hidden />
+                  {stories[0].result}
+                </p>
+              </div>
+            </div>
+          </MotionArticle>
+          <div className="testimonial-side">
+            {stories.slice(1).map((story, index) => (
+              <MotionArticle key={story.name} delay={(index + 1) * 0.1} className="testimonial-small hover-lift rounded-lg border border-brand-blue/18 bg-brand-blue p-5 text-white shadow-xl shadow-brand-navy/8">
+                <Quote size={23} className="text-brand-teal-light" aria-hidden />
+                <p className="mt-3 text-sm leading-6 text-white/86">{story.quote}</p>
+                <div className="mt-4 border-t border-white/18 pt-4">
+                  <p className="font-heading text-lg font-medium">{story.name}</p>
+                  <p className="mt-1 text-sm text-white/62">{story.role}</p>
+                  <p className="mt-3 inline-flex items-center gap-2 rounded-md bg-brand-red px-3 py-2 text-xs font-bold text-white">
+                    <Star size={15} fill="currentColor" aria-hidden />
+                    {story.result}
+                  </p>
+                </div>
+              </MotionArticle>
+            ))}
+          </div>
         </div>
-        <MotionReveal className="mt-8 flex justify-center"><Link href="/testimonials" className="button-secondary border-brand-navy/12">Conocer los resultados <ArrowRight size={18} aria-hidden /></Link></MotionReveal>
+        <MotionReveal className="mt-10 flex justify-center" delay={0.12}>
+          <a href="/contact" className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-brand-navy px-6 text-sm font-extrabold text-white shadow-xl shadow-brand-navy/12 transition hover:bg-brand-blue sm:w-fit">
+            Become the Next Success Story
+            <ArrowRight size={18} aria-hidden />
+          </a>
+        </MotionReveal>
       </div>
     </section>
   );
