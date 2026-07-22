@@ -20,21 +20,36 @@ export const metadata: Metadata = {
   description:
     "Academia de idiomas online dirigida por Alberto A. Sosa. Clases de inglés por niveles, privadas y grupales, con conversación inicial gratuita.",
   openGraph: {
-    title: "Alberto Academy",
+    title: "Alberto Academy | Hable Inglés con Confianza",
     description:
       "Aprenda inglés de forma progresiva, practique conversaciones reales y gane seguridad con una guía profesional.",
     url: "https://albertoacademy.com",
     siteName: "Alberto Academy",
     images: [
       {
-        url: "/images/alberto-academy-hero.webp",
-        width: 1800,
-        height: 868,
-        alt: "Clase de inglés online en Alberto Academy",
+        url: "/images/alberto-academy-og.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Alberto Academy — Hable Inglés con Confianza",
+        type: "image/jpeg",
+      },
+      {
+        url: "/images/alberto-academy-og.png",
+        width: 1731,
+        height: 909,
+        alt: "Alberto Academy — Hable Inglés con Confianza",
+        type: "image/png",
       },
     ],
     locale: "es_DO",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Alberto Academy | Hable Inglés con Confianza",
+    description:
+      "Aprenda inglés de forma progresiva, practique conversaciones reales y gane seguridad con una guía profesional.",
+    images: ["/images/alberto-academy-og.jpg"],
   },
 };
 
