@@ -56,13 +56,13 @@ export function GroupedFAQAccordion({ items, categories }: GroupedFAQAccordionPr
           <MotionReveal key={category} id={slugify(category)} delay={groupIndex * 0.06} className="scroll-mt-24">
             <div className="mb-5 grid gap-3 sm:mb-7 sm:grid-cols-[1fr_auto] sm:items-end">
               <div>
-                <p className="section-kicker">Topic {String(groupIndex + 1).padStart(2, "0")}</p>
+                <p className="section-kicker">Tema {String(groupIndex + 1).padStart(2, "0")}</p>
                 <h2 className="mt-2 font-heading text-[2rem] font-normal leading-tight text-brand-navy sm:text-4xl">
                   {category}
                 </h2>
               </div>
               <p className="w-fit rounded-full border border-brand-navy/10 bg-surface-white px-3 py-1.5 text-xs font-extrabold uppercase tracking-[0.08em] text-brand-navy/52 shadow-sm shadow-brand-navy/5 sm:text-sm">
-                {faqs.length} questions
+                {faqs.length} preguntas
               </p>
             </div>
 

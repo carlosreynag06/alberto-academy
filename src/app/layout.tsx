@@ -15,25 +15,25 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://alberto-academy.com"),
-  title: "Alberto Academy | Personalized Online English Tutoring",
+  metadataBase: new URL("https://albertoacademy.com"),
+  title: "Alberto Academy | Inglés online para hablar con seguridad",
   description:
-    "Premium online English tutoring with Alberto Sosa, offering personalized lessons, interactive resources, success stories, and trial session booking.",
+    "Academia de idiomas online dirigida por Alberto A. Sosa. Clases de inglés por niveles, privadas y grupales, con conversación inicial gratuita.",
   openGraph: {
     title: "Alberto Academy",
     description:
-      "Personalized English coaching and interactive language resources for confident communication.",
-    url: "https://alberto-academy.com",
+      "Aprenda inglés de forma progresiva, practique conversaciones reales y gane seguridad con una guía profesional.",
+    url: "https://albertoacademy.com",
     siteName: "Alberto Academy",
     images: [
       {
         url: "/images/alberto-academy-hero.webp",
         width: 1800,
         height: 868,
-        alt: "Alberto Academy online English tutoring session",
+        alt: "Clase de inglés online en Alberto Academy",
       },
     ],
-    locale: "en_US",
+    locale: "es_DO",
     type: "website",
   },
 };
@@ -44,7 +44,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable} scroll-smooth`}>
+    <html lang="es" className={`${inter.variable} ${playfair.variable} scroll-smooth`}>
       <body>{children}</body>
     </html>
   );

@@ -29,7 +29,7 @@ export function LegalPage({ eyebrow, title, description, updated, sections }: Le
           <MotionReveal>
             <Link href="/" className="inline-flex items-center gap-2 text-sm font-bold text-white/62 transition hover:text-white">
               <ArrowLeft size={16} aria-hidden />
-              Back to home
+              Volver al inicio
             </Link>
             <p className="section-kicker-dark mt-7 sm:mt-9">{eyebrow}</p>
             <h1 className="section-heading mt-4 max-w-3xl text-white">{title}</h1>
@@ -40,10 +40,10 @@ export function LegalPage({ eyebrow, title, description, updated, sections }: Le
             <div className="grid size-10 place-items-center rounded-lg bg-brand-teal text-white sm:size-11 lg:size-12">
               <ShieldCheck size={22} aria-hidden />
             </div>
-            <p className="mt-4 text-xs font-bold uppercase tracking-[0.08em] text-white/54 sm:text-sm">Last Updated</p>
+            <p className="mt-4 text-xs font-bold uppercase tracking-[0.08em] text-white/54 sm:text-sm">Última actualización</p>
             <p className="mt-2 font-heading text-2xl font-normal text-white lg:text-3xl">{updated}</p>
             <p className="mt-3 text-sm leading-6 text-white/62 lg:mt-4">
-              These pages are written for clarity, trust, and transparency around Alberto Academy&apos;s online tutoring experience.
+              Esta información busca ofrecer claridad y transparencia sobre los servicios online de Alberto Academy.
             </p>
           </MotionReveal>
         </div>
@@ -54,7 +54,7 @@ export function LegalPage({ eyebrow, title, description, updated, sections }: Le
           <aside className="legal-overview-column">
             <div className="legal-overview-panel rounded-xl border border-brand-navy/10 bg-surface-white p-4 shadow-xl shadow-brand-navy/6 sm:p-5 lg:p-6">
               <MotionReveal>
-                <p className="section-kicker">Overview</p>
+                <p className="section-kicker">Contenido</p>
                 <div className="legal-overview-links mt-4 grid gap-2 sm:mt-5">
                   {sections.map((section) => (
                     <a
@@ -100,14 +100,14 @@ export function LegalPage({ eyebrow, title, description, updated, sections }: Le
             })}
 
             <MotionReveal className="rounded-xl bg-brand-navy p-5 text-white shadow-2xl shadow-brand-navy/14 sm:p-6 lg:p-8">
-              <p className="section-kicker-dark">Questions</p>
-              <h2 className="mt-3 font-heading text-2xl font-normal sm:text-3xl">Need help with a policy detail?</h2>
+              <p className="section-kicker-dark">Preguntas</p>
+              <h2 className="mt-3 font-heading text-2xl font-normal sm:text-3xl">¿Necesita aclarar algún punto?</h2>
               <p className="mt-4 max-w-2xl leading-7 text-white/68">
-                Contact Alberto Academy before booking or sharing information if you need clarification about these terms.
+                Comuníquese con Alberto Academy antes de inscribirse o compartir información si necesita una explicación adicional.
               </p>
-              <a href="mailto:hello@albertoacademy.com" className="mt-6 inline-flex max-w-full items-center gap-2 rounded-md bg-brand-red px-4 py-3 text-sm font-extrabold text-white transition hover:bg-brand-red-dark sm:px-5">
+              <a href="mailto:albertoalex0033@gmail.com" className="mt-6 inline-flex max-w-full items-center gap-2 rounded-md bg-brand-red px-4 py-3 text-sm font-extrabold text-white transition hover:bg-brand-red-dark sm:px-5">
                 <Mail size={17} aria-hidden />
-                <span className="truncate">hello@albertoacademy.com</span>
+                <span className="truncate">albertoalex0033@gmail.com</span>
               </a>
             </MotionReveal>
           </div>

@@ -30,6 +30,8 @@ export function ThemeToggle({ scope, compact = false }: { scope: ThemeScope; com
   }
 
   const Icon = mode === "dark" ? Sun : Moon;
+  const publicLabel = mode === "dark" ? "Cambiar al modo claro" : "Cambiar al modo oscuro";
+  const adminLabel = `Switch admin theme to ${mode === "dark" ? "light" : "dark"} mode`;
 
   return (
     <button
@@ -40,10 +42,10 @@ export function ThemeToggle({ scope, compact = false }: { scope: ThemeScope; com
           ? "size-10 border-brand-navy/12 text-brand-navy hover:border-brand-teal hover:text-brand-blue"
           : "h-10 border-white/12 px-3 text-sm text-white/74 hover:bg-white/10 hover:text-white"
       }`}
-      aria-label={`Switch ${scope} theme to ${mode === "dark" ? "light" : "dark"} mode`}
+      aria-label={scope === "public" ? publicLabel : adminLabel}
     >
       <Icon size={17} aria-hidden />
-      {!compact && <span>{mode === "dark" ? "Light" : "Dark"}</span>}
+      {!compact && <span>{scope === "public" ? (mode === "dark" ? "Claro" : "Oscuro") : (mode === "dark" ? "Light" : "Dark")}</span>}
     </button>
   );
 }

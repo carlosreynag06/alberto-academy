@@ -3,57 +3,57 @@ import { CalendarClock, CreditCard, FileCheck2, GraduationCap, RefreshCcw, Scale
 import { LegalPage } from "@/components/legal-page";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | Alberto Academy",
-  description: "Terms for Alberto Academy online English tutoring, trial lessons, scheduling, resources, and student responsibilities.",
+  title: "Términos del servicio | Alberto Academy",
+  description: "Términos sobre clases online, horarios, pagos, materiales y responsabilidades de estudiantes de Alberto Academy.",
 };
 
 const sections = [
   {
-    title: "Service Overview",
+    title: "Descripción del servicio",
     icon: GraduationCap,
     copy: [
-      "Alberto Academy provides personalized online English tutoring, trial sessions, learning recommendations, and interactive resources for students who want practical communication skills.",
-      "Programs may include live lessons, guided practice, progress feedback, course materials, and recommendations based on the student's goals and current level.",
+      "Alberto Academy ofrece enseñanza online de inglés y español mediante programas por niveles, clases individuales y grupales, tutorías y coaching especializado.",
+      "La conversación inicial gratuita sirve para conocer objetivos y orientar el nivel. No constituye una clase de prueba.",
     ],
   },
   {
-    title: "Booking and Scheduling",
+    title: "Reservas y horarios",
     icon: CalendarClock,
     copy: [
-      "Trial lessons and tutoring sessions are scheduled based on availability. A session is confirmed only after the date, time, and format have been agreed upon.",
-      "Students are responsible for joining sessions on time with a stable internet connection, working microphone, and any requested materials.",
+      "Las sesiones se confirman una vez acordados la fecha, la hora y el formato. Las clases privadas duran entre una y dos horas; las grupales duran dos horas y se imparten dos días por semana.",
+      "El estudiante debe conectarse puntualmente con internet estable, micrófono y un teléfono inteligente o computadora.",
     ],
   },
   {
-    title: "Payments and Plans",
+    title: "Pagos y planes",
     icon: CreditCard,
     copy: [
-      "Pricing, packages, and payment timing will be confirmed before paid tutoring begins. Any included materials, session length, and plan details should be reviewed before purchase.",
-      "Paid lessons or packages are intended for the student or group named at booking unless Alberto Academy agrees otherwise.",
+      "Los precios y condiciones se confirman antes de iniciar. Se aceptan transferencias y pagos con tarjeta mediante servicios en línea.",
+      "Al finalizar el mes existe un periodo de gracia de 10 días. Después puede aplicarse un recargo de RD$300. Si existen dos meses de atraso, el servicio puede pausarse hasta completar los pagos pendientes.",
     ],
   },
   {
-    title: "Cancellations and Changes",
+    title: "Asistencia y cambios",
     icon: RefreshCcw,
     copy: [
-      "Students should request schedule changes with reasonable advance notice. Rescheduling options may depend on tutor availability and the selected tutoring plan.",
-      "Repeated missed sessions, late arrivals, or last-minute cancellations may affect future scheduling or package terms.",
+      "Las ausencias, justificadas o no, se registran en el control de asistencia. Se espera que el estudiante complete al menos el 75 % de asistencia para finalizar satisfactoriamente el programa.",
+      "Los cambios de horario dependen de la disponibilidad y, en clases grupales, de que exista otro grupo con nivel y unidades compatibles. Las pausas deben coordinarse previamente.",
     ],
   },
   {
-    title: "Learning Materials",
+    title: "Materiales de aprendizaje",
     icon: FileCheck2,
     copy: [
-      "Course resources, class notes, worksheets, and learning materials provided by Alberto Academy are for personal study and tutoring use.",
-      "Materials may not be copied, resold, distributed, or presented as another program without written permission.",
+      "Las clases pueden utilizar libros, PDF, videos, audios, presentaciones y ejercicios interactivos. Los materiales base con costo se cotizan por separado.",
+      "Los recursos entregados son para uso personal del estudiante y no pueden venderse, distribuirse ni presentarse como parte de otro programa sin autorización.",
     ],
   },
   {
-    title: "Student Responsibilities",
+    title: "Responsabilidad del estudiante",
     icon: Scale,
     copy: [
-      "Students are expected to participate respectfully, complete agreed practice tasks, and communicate honestly about goals, level, progress, and scheduling needs.",
-      "Alberto Academy aims to provide structured instruction and useful feedback, but results depend on attendance, practice, consistency, and each student's learning context.",
+      "El estudiante debe participar con respeto, realizar las prácticas acordadas y comunicar con honestidad sus necesidades de nivel, objetivos y horario.",
+      "Alberto Academy ofrece estructura, enseñanza y seguimiento, pero los resultados dependen de la asistencia, la práctica, la constancia y el contexto de cada persona. No se garantizan resultados automáticos.",
     ],
   },
 ];
@@ -61,10 +61,10 @@ const sections = [
 export default function TermsPage() {
   return (
     <LegalPage
-      eyebrow="Terms of Service"
-      title="Simple terms for a focused learning experience."
-      description="These terms explain how Alberto Academy handles tutoring sessions, scheduling, materials, payments, and student participation."
-      updated="June 29, 2026"
+      eyebrow="Términos del servicio"
+      title="Condiciones claras para una experiencia de aprendizaje responsable."
+      description="Estos términos explican cómo funcionan las clases, los horarios, los pagos, los materiales y la participación del estudiante."
+      updated="22 de julio de 2026"
       sections={sections}
     />
   );
