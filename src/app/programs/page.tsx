@@ -141,73 +141,61 @@ function PrimaryServices() {
 function AdditionalServices() {
   return (
     <section id="rutas-complementarias" className="bg-surface-white px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
-      <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[0.72fr_1.28fr] lg:items-start lg:gap-8">
-        <MotionReveal className="rounded-xl bg-brand-navy p-6 text-white shadow-2xl shadow-brand-navy/14 sm:p-8 lg:sticky lg:top-24 lg:p-9">
-          <p className="section-kicker-dark">Rutas complementarias</p>
-          <h2 className="mt-3 font-heading text-3xl font-normal leading-tight sm:text-4xl">Tres soluciones para necesidades más específicas.</h2>
-          <p className="mt-5 leading-7 text-white/68">
-            Elija una ruta completa, reciba apoyo puntual o prepárese para una meta concreta. Cada opción conserva el acompañamiento directo de Alberto.
+      <div className="mx-auto max-w-6xl">
+        <MotionReveal className="grid gap-6 border-b border-brand-navy/20 pb-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-end lg:gap-16">
+          <div>
+            <p className="section-kicker">Rutas complementarias</p>
+            <h2 className="section-heading mt-3">Tres soluciones para objetivos más específicos.</h2>
+          </div>
+          <p className="body-copy-lg max-w-2xl lg:justify-self-end">
+            Una ruta completa, apoyo puntual o preparación para una meta concreta. Tres formas diferentes de trabajar con la orientación directa de Alberto.
           </p>
-
-          <nav className="mt-8 border-t border-white/12" aria-label="Rutas complementarias">
-            {additionalServices.map((program, index) => (
-              <a key={program.id} href={`#${program.id}`} className="group flex items-center gap-4 border-b border-white/12 py-4 text-white transition hover:text-brand-teal-light">
-                <span className="font-heading text-2xl font-normal text-brand-teal-light">{String(index + 1).padStart(2, "0")}</span>
-                <span className="flex-1 text-sm font-extrabold">{program.title}</span>
-                <ArrowRight size={16} className="transition group-hover:translate-x-1" aria-hidden />
-              </a>
-            ))}
-          </nav>
         </MotionReveal>
 
-        <div className="grid gap-4 sm:gap-5">
+        <div>
           {additionalServices.map((program, index) => {
             const Icon = serviceIcons[program.id as keyof typeof serviceIcons] ?? BookOpenCheck;
-            const accentClass = index === 0 ? "border-t-brand-red" : "border-t-brand-teal";
 
             return (
-              <MotionArticle key={program.id} id={program.id} delay={index * 0.07} className={`scroll-mt-24 rounded-xl border border-t-4 border-brand-navy/10 ${accentClass} bg-surface-cream p-5 shadow-xl shadow-brand-navy/6 sm:p-7 lg:p-8`}>
-                <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="flex items-center gap-4">
-                    <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-brand-navy text-white"><Icon size={21} strokeWidth={1.8} aria-hidden /></span>
-                    <div>
-                      <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-brand-red">Opción {String(index + 1).padStart(2, "0")}</p>
-                      <p className="mt-1 text-sm font-bold text-brand-navy/52">{program.eyebrow}</p>
-                    </div>
+              <MotionArticle key={program.id} id={program.id} delay={index * 0.07} className="scroll-mt-24 border-b border-brand-navy/20 py-10 sm:py-12 lg:py-14">
+                <div className="grid gap-7 lg:grid-cols-[0.18fr_0.72fr_1.1fr] lg:gap-10 xl:gap-14">
+                  <div className="flex items-start justify-between lg:block">
+                    <span className="font-heading text-5xl font-normal leading-none text-brand-navy/18 sm:text-6xl">{String(index + 1).padStart(2, "0")}</span>
+                    <Icon size={23} strokeWidth={1.6} className="mt-1 text-brand-teal lg:mt-6" aria-hidden />
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="rounded-md bg-brand-navy px-3 py-2 text-xs font-extrabold uppercase tracking-[0.06em] text-white">{program.badge}</span>
-                    <span className="rounded-md border border-brand-navy/10 bg-surface-white px-3 py-2 text-xs font-extrabold uppercase tracking-[0.06em] text-brand-blue">{program.format}</span>
-                  </div>
-                </div>
 
-                <div className="mt-6 grid gap-6 xl:grid-cols-[1.04fr_0.96fr] xl:gap-8">
                   <div>
-                    <h3 className="font-heading text-3xl font-normal leading-tight text-brand-navy sm:text-4xl">{program.title}</h3>
-                    <p className="mt-3 font-heading text-xl font-normal leading-snug text-brand-blue">{program.headline}</p>
-                    <p className="mt-4 text-sm leading-7 text-brand-navy/66">{program.description}</p>
-                    <div className="mt-5 flex flex-wrap gap-2 border-t border-brand-navy/10 pt-5">
-                      {[program.focus, program.support].map((item) => (
-                        <span key={item} className="rounded-md border border-brand-navy/10 bg-surface-white px-3 py-2 text-xs font-extrabold uppercase tracking-[0.06em] text-brand-navy/68">{item}</span>
-                      ))}
-                    </div>
+                    <p className="text-xs font-extrabold uppercase tracking-[0.1em] text-brand-red">{program.eyebrow}</p>
+                    <h3 className="mt-3 font-heading text-3xl font-normal leading-tight text-brand-navy sm:text-4xl">{program.title}</h3>
+                    <p className="mt-5 text-xs font-extrabold uppercase leading-6 tracking-[0.07em] text-brand-navy/52">
+                      {program.badge}<span className="mx-2 text-brand-navy/20">/</span>{program.format}
+                    </p>
+                    <p className="mt-2 text-xs font-extrabold uppercase leading-6 tracking-[0.07em] text-brand-navy/52">
+                      {program.focus}<span className="mx-2 text-brand-navy/20">/</span>{program.support}
+                    </p>
                   </div>
 
-                  <div className="flex flex-col rounded-lg border border-brand-navy/10 bg-surface-white p-5">
-                    <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-brand-navy/46">Lo que trabajará</p>
-                    <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+                  <div>
+                    <p className="font-heading text-2xl font-normal leading-snug text-brand-blue sm:text-3xl">{program.headline}</p>
+                    <p className="mt-4 text-sm leading-7 text-brand-navy/66">{program.description}</p>
+
+                    <div className="mt-7 grid gap-x-8 gap-y-3 border-y border-brand-navy/12 py-5 sm:grid-cols-2">
                       {program.outcomes.map((outcome) => (
                         <div key={outcome} className="flex items-center gap-2">
-                          <CheckCircle2 size={16} className="shrink-0 text-brand-teal" aria-hidden />
+                          <CheckCircle2 size={15} className="shrink-0 text-brand-teal" aria-hidden />
                           <span className="text-sm font-bold text-brand-navy/74">{outcome}</span>
                         </div>
                       ))}
                     </div>
-                    <div className="mt-5 border-t border-brand-navy/10 pt-4">
+
+                    <div className="mt-5 grid gap-2 sm:grid-cols-[auto_1fr] sm:gap-5">
                       <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-brand-navy/46">Ideal para</p>
-                      <p className="mt-2 text-sm leading-6 text-brand-navy/64">{program.bestFor}</p>
+                      <p className="text-sm leading-6 text-brand-navy/64">{program.bestFor}</p>
                     </div>
-                    <Link href="/contact" className="button-navy mt-5">Consultar esta opción <ArrowRight size={18} aria-hidden /></Link>
+
+                    <Link href="/contact" className="mt-6 inline-flex items-center gap-2 border-b-2 border-brand-red pb-1 text-sm font-extrabold text-brand-red transition hover:border-brand-red-dark hover:text-brand-red-dark">
+                      Consultar esta opción <ArrowRight size={17} aria-hidden />
+                    </Link>
                   </div>
                 </div>
               </MotionArticle>
