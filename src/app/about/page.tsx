@@ -15,7 +15,6 @@ const academyStats = [
   { value: "4+", label: "Años de experiencia" },
   { value: "400+", label: "Estudiantes enseñados" },
   { value: "4", label: "Niveles de formación" },
-  { value: "85%", label: "Método directo" },
 ];
 
 const values = [
@@ -116,7 +115,7 @@ function AcademyIntro() {
 function StatsDivider() {
   return (
     <section className="bg-surface-cream px-4 pb-12 text-white sm:px-6 sm:pb-14 lg:px-8 lg:pb-16">
-      <MotionReveal className="mx-auto grid max-w-6xl overflow-hidden rounded-xl border border-white/10 bg-brand-navy shadow-2xl shadow-brand-navy/12 sm:grid-cols-2 lg:grid-cols-4">
+      <MotionReveal className="mx-auto grid max-w-6xl overflow-hidden rounded-xl border border-white/10 bg-brand-navy shadow-2xl shadow-brand-navy/12 sm:grid-cols-3">
         {academyStats.map((item) => (
           <div key={item.label} className="border-b border-white/10 p-6 last:border-b-0 sm:border-r lg:border-b-0 lg:p-7">
             <CountUpStat value={item.value} className="block font-heading text-[2.1rem] font-normal leading-none text-brand-teal-light" />
@@ -134,22 +133,8 @@ function MethodValues() {
       <div className="section-container">
         <MotionReveal className="mx-auto max-w-3xl text-center">
           <p className="section-kicker-dark">Cómo enseña Alberto</p>
-          <h2 className="section-heading mt-3">85 % método directo. 100 % intención pedagógica.</h2>
+          <h2 className="section-heading mt-3">Una clase para comprender, practicar y utilizar el idioma.</h2>
           <p className="mt-5 leading-7 text-white/68">La traducción se utiliza solo como apoyo. La mayor parte de la clase invita al estudiante a comprender, asociar, responder y utilizar el idioma.</p>
-          <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-5">
-            {[
-              ["30 %", "Conversación"],
-              ["20 %", "Lectura"],
-              ["20 %", "Gramática"],
-              ["15 %", "Explicación"],
-              ["15 %", "Evaluación"],
-            ].map(([value, label]) => (
-              <div key={label} className="rounded-lg border border-white/12 bg-white/[0.06] p-3 text-center">
-                <p className="font-heading text-2xl text-brand-teal-light">{value}</p>
-                <p className="mt-1 text-xs font-bold uppercase text-white/62">{label}</p>
-              </div>
-            ))}
-          </div>
         </MotionReveal>
         <div className="mt-10 grid gap-4 sm:grid-cols-2">
           {values.map((value, index) => {

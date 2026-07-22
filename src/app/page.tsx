@@ -261,7 +261,7 @@ function SuccessStories() {
 function FAQ() {
   return (
     <section id="faq" className="section-pad-tight bg-surface-cream">
-      <div className="mx-auto max-w-5xl"><MotionReveal><p className="section-kicker text-center">Antes de comenzar</p><h2 className="section-heading mt-3 text-center">Preguntas frecuentes</h2></MotionReveal><ExclusiveFAQAccordion items={homepageFaqs} /><MotionReveal className="mt-8 flex justify-center"><Link href="/faq" className="button-secondary border-brand-navy/12">Ver todas las respuestas <ArrowRight size={18} aria-hidden /></Link></MotionReveal></div>
+      <div className="mx-auto max-w-5xl"><MotionReveal><p className="section-kicker text-center">Antes de comenzar</p><h2 className="section-heading mt-3 text-center">Preguntas frecuentes</h2></MotionReveal><ExclusiveFAQAccordion items={homepageFaqs} /><MotionReveal className="mt-8 flex justify-center"><Link href="/faq" className="button-primary">Ver todas las respuestas <ArrowRight size={18} aria-hidden /></Link></MotionReveal></div>
     </section>
   );
 }
