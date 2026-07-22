@@ -5,6 +5,7 @@ import Image from "next/image";
 import { jsPDF } from "jspdf";
 import { ThemeToggle } from "@/components/theme-toggle";
 import type { Lead, LeadStatus, Level, Student, StudentStatus } from "@/lib/crm-types";
+import { publicLeadInterestOptions } from "@/lib/crm-types";
 import { questionnaireQuestionCount, questionnaireSections } from "@/lib/questionnaire";
 import {
   clearAdminSession,
@@ -79,7 +80,16 @@ const leadStatuses: LeadStatus[] = ["New", "Contacted", "Trial booked", "Won", "
 const studentStatuses: StudentStatus[] = ["Active", "Paused", "Completed"];
 const levels: Level[] = ["Beginner", "Intermediate", "Advanced", "Not sure"];
 const studentLevels: Student["level"][] = ["Beginner", "Intermediate", "Advanced"];
-const interests = ["English conversation", "Business English", "Exam prep", "Academic writing", "Spanish for foreigners", "Travel English"];
+const interests = [
+  ...publicLeadInterestOptions,
+  // Keep legacy values available so older leads remain editable.
+  "English conversation",
+  "Business English",
+  "Exam prep",
+  "Academic writing",
+  "Spanish for foreigners",
+  "Travel English",
+];
 const programs = ["Conversation Fluency", "Grammar & Writing", "Academic English", "Career English"];
 const sources = ["Website form", "Instagram", "WhatsApp", "Referral", "Facebook"];
 
@@ -88,7 +98,7 @@ const emptyLead: Lead = {
   name: "",
   email: "",
   phone: "",
-  interest: "English conversation",
+  interest: publicLeadInterestOptions[0],
   level: "Not sure",
   status: "New",
   source: "Website form",
@@ -197,7 +207,7 @@ export function AdminPanel() {
     return leads.filter((lead) =>
       (leadStatusFilter === "All" || lead.status === leadStatusFilter) &&
       (!query ||
-        [lead.name, lead.email, lead.phone, lead.interest, lead.status, lead.source].some((value) =>
+        [lead.name, lead.email, lead.phone, lead.interest, lead.level, lead.status, lead.source].some((value) =>
           value.toLowerCase().includes(query),
         )),
     );

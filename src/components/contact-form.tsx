@@ -2,22 +2,14 @@
 
 import { type FormEvent, useState } from "react";
 import { ArrowRight } from "lucide-react";
+import { publicLeadInterestOptions } from "@/lib/crm-types";
 import { isSupabaseConfigured, submitPublicLead } from "@/lib/supabase-rest";
-
-const interestOptions = [
-  "Programa de inglés por niveles",
-  "Clases individuales",
-  "Clases grupales",
-  "Tutoría personalizada",
-  "Preparación para entrevistas o exámenes",
-  "Español para extranjeros",
-];
 
 export function ContactForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [interest, setInterest] = useState(interestOptions[0]);
+  const [interest, setInterest] = useState<string>(publicLeadInterestOptions[0]);
   const [level, setLevel] = useState("Not sure");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState<string | null>(null);
@@ -40,7 +32,7 @@ export function ContactForm() {
       setName("");
       setEmail("");
       setPhone("");
-      setInterest(interestOptions[0]);
+      setInterest(publicLeadInterestOptions[0]);
       setLevel("Not sure");
     } catch {
       setStatus("error");
@@ -69,7 +61,7 @@ export function ContactForm() {
         <label className="contact-line-field">
           Servicio de interés
           <select name="interest" value={interest} onChange={(event) => setInterest(event.target.value)}>
-            {interestOptions.map((option) => <option key={option}>{option}</option>)}
+            {publicLeadInterestOptions.map((option) => <option key={option}>{option}</option>)}
           </select>
         </label>
 
@@ -89,9 +81,13 @@ export function ContactForm() {
           </p>
         )}
 
-        <button type="submit" disabled={status === "loading"} className="group flex items-center justify-between border-b border-white/28 pb-6 text-left font-heading text-2xl font-normal text-white transition hover:border-white disabled:cursor-not-allowed disabled:opacity-60 sm:pb-7 sm:text-3xl">
+        <button
+          type="submit"
+          disabled={status === "loading"}
+          className="group mt-1 inline-flex min-h-14 w-full items-center justify-center gap-3 rounded-lg border border-white/10 bg-brand-red px-5 py-4 text-center text-base font-extrabold text-white shadow-[0_16px_36px_rgba(0,0,0,0.24)] transition hover:-translate-y-0.5 hover:bg-brand-red-dark hover:shadow-[0_20px_42px_rgba(0,0,0,0.3)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-teal-light/35 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 sm:text-lg"
+        >
           {status === "loading" ? "Enviando..." : "Solicitar conversación inicial"}
-          <ArrowRight className="shrink-0 transition group-hover:translate-x-1" size={30} aria-hidden />
+          <ArrowRight className="shrink-0 transition group-hover:translate-x-1" size={22} aria-hidden />
         </button>
       </div>
     </form>
