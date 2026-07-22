@@ -106,7 +106,12 @@ export default function PricingPage() {
                       <p key={feature} className={`flex items-start gap-2 text-sm font-semibold leading-6 ${plan.featured ? "text-white/76" : "text-brand-navy/70"}`}><CheckCircle2 size={16} className={`mt-1 shrink-0 ${plan.featured ? "text-brand-teal-light" : "text-brand-teal"}`} aria-hidden />{feature}</p>
                     ))}
                   </div>
-                  <Link href="/contact" className="button-primary mt-7">{plan.cta}<ArrowRight size={18} aria-hidden /></Link>
+                  <Link
+                    href="/contact"
+                    className={`mt-7 ${plan.featured ? "button-primary" : "button-navy"}`}
+                  >
+                    {plan.cta}<ArrowRight size={18} aria-hidden />
+                  </Link>
                 </MotionArticle>
               );
             })}

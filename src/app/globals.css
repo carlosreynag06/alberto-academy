@@ -408,7 +408,8 @@ html[data-app-surface="public"][data-public-theme="dark"] .form-field option {
 }
 
 .button-primary,
-.button-secondary {
+.button-secondary,
+.button-navy {
   display: inline-flex;
   height: 3rem;
   align-items: center;
@@ -444,6 +445,15 @@ html[data-app-surface="public"][data-public-theme="dark"] .form-field option {
 
 .button-primary:hover {
   background: var(--brand-red-dark);
+}
+
+.button-navy {
+  background: var(--brand-navy);
+  color: var(--surface-white);
+}
+
+.button-navy:hover {
+  background: var(--brand-blue);
 }
 
 .button-secondary {
@@ -654,7 +664,8 @@ html[data-app-surface="public"][data-public-theme="dark"] .form-field option {
   }
 
   .button-primary,
-  .button-secondary {
+  .button-secondary,
+  .button-navy {
     width: 100%;
     padding-left: 1rem;
     padding-right: 1rem;
