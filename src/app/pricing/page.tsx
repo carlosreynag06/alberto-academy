@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Award, CalendarCheck, CheckCircle2, Clock3, CreditCard, GraduationCap, MessageCircle, ShieldCheck, Target } from "lucide-react";
+import { ArrowRight, Award, CalendarCheck, CheckCircle2, Clock3, CreditCard, GraduationCap, Laptop, MessageCircle, ShieldCheck, Target } from "lucide-react";
 import { MotionArticle, MotionReveal } from "@/components/motion-reveal";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 
@@ -16,7 +16,7 @@ const pricingPlans = [
     price: "RD$900",
     cadence: "por hora",
     description: "Un plan uno a uno para trabajar su nivel, sus objetivos y las situaciones en las que realmente necesita comunicarse.",
-    badge: "15 % menos el primer mes",
+    badge: "15 % de descuento el primer mes",
     icon: Target,
     features: ["Mínimo de 10 horas al mes", "Clases de 1 a 2 horas", "Compromiso inicial de 3 meses", "Plan y corrección personalizados"],
     cta: "Consultar clases privadas",
@@ -27,7 +27,7 @@ const pricingPlans = [
     price: "RD$1,500",
     cadence: "por persona al mes",
     description: "Una rutina constante para aprender con estudiantes de nivel similar, practicar en grupo y avanzar por unidades.",
-    badge: "15 % menos el primer mes",
+    badge: "15 % de descuento el primer mes",
     icon: GraduationCap,
     featured: true,
     features: ["Lunes y miércoles o martes y jueves", "Dos horas por clase", "Grupo organizado por nivel", "Interacción y práctica guiada"],
@@ -52,6 +52,7 @@ const policyCards = [
   { title: "Materiales", copy: "Los libros o materiales base con costo se cotizan por separado antes de confirmar la inscripción.", icon: ShieldCheck },
   { title: "Progreso responsable", copy: "Los resultados dependen de la asistencia, la práctica y la responsabilidad del estudiante.", icon: Clock3 },
   { title: "Reconocimiento al desempeño", copy: "Al finalizar cada nivel, el estudiante con la mejor calificación recibe gratis los materiales del nivel siguiente.", icon: Award },
+  { title: "Clases online", copy: "Las sesiones se imparten por Google Meet, con seguimiento en Google Classroom y comunicación por WhatsApp.", icon: Laptop },
 ];
 
 export default function PricingPage() {
@@ -105,7 +106,7 @@ export default function PricingPage() {
                       <p key={feature} className={`flex items-start gap-2 text-sm font-semibold leading-6 ${plan.featured ? "text-white/76" : "text-brand-navy/70"}`}><CheckCircle2 size={16} className={`mt-1 shrink-0 ${plan.featured ? "text-brand-teal-light" : "text-brand-teal"}`} aria-hidden />{feature}</p>
                     ))}
                   </div>
-                  <Link href="/contact" className={`mt-7 ${plan.featured ? "button-primary" : "button-secondary border-brand-navy/12"}`}>{plan.cta}<ArrowRight size={18} aria-hidden /></Link>
+                  <Link href="/contact" className="button-primary mt-7">{plan.cta}<ArrowRight size={18} aria-hidden /></Link>
                 </MotionArticle>
               );
             })}
@@ -117,9 +118,9 @@ export default function PricingPage() {
         <div className="mx-auto max-w-6xl">
           <MotionReveal className="mx-auto max-w-3xl text-center">
             <p className="section-kicker-dark">Antes de inscribirse</p>
-            <h2 className="section-heading mt-3 text-white">Toda decisión debe comenzar con información clara.</h2>
+            <h2 className="section-heading mt-3 text-white">Preguntas frecuentes</h2>
           </MotionReveal>
-          <div className="mt-10 grid gap-4 sm:grid-cols-2">
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {policyCards.map((item, index) => {
               const Icon = item.icon;
               return (
