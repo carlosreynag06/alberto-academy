@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, BookOpenCheck, BriefcaseBusiness, CalendarCheck, CheckCircle2, Languages, MessageCircle, PenLine, Users } from "lucide-react";
+import { ArrowRight, BookOpenCheck, CalendarCheck, CheckCircle2, Languages, MessageCircle, Users } from "lucide-react";
 import { MotionArticle, MotionImagePanel, MotionReveal } from "@/components/motion-reveal";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { programTracks } from "@/lib/programs";
@@ -12,18 +12,13 @@ export const metadata: Metadata = {
 };
 
 const serviceIcons = {
-  "programa-por-niveles": BookOpenCheck,
   "clases-individuales": MessageCircle,
   "clases-grupales": Users,
-  "tutorias-personalizadas": PenLine,
-  "coaching-especializado": BriefcaseBusiness,
   "espanol-para-extranjeros": Languages,
 };
 
 const primaryServiceIds = ["clases-individuales", "clases-grupales", "espanol-para-extranjeros"];
-const additionalServiceIds = ["programa-por-niveles", "tutorias-personalizadas", "coaching-especializado"];
 const primaryServices = programTracks.filter((program) => primaryServiceIds.includes(program.id));
-const additionalServices = programTracks.filter((program) => additionalServiceIds.includes(program.id));
 
 export default function ProgramsPage() {
   return (
@@ -140,68 +135,103 @@ function PrimaryServices() {
 
 function AdditionalServices() {
   return (
-    <section id="rutas-complementarias" className="bg-surface-white px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
-      <div className="mx-auto max-w-6xl">
-        <MotionReveal className="grid gap-6 border-b border-brand-navy/20 pb-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-end lg:gap-16">
-          <div>
+    <section id="rutas-complementarias">
+      <div className="bg-surface-white px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+        <div className="mx-auto max-w-6xl">
+          <MotionReveal className="max-w-4xl">
             <p className="section-kicker">Rutas complementarias</p>
-            <h2 className="section-heading mt-3">Tres soluciones para objetivos más específicos.</h2>
-          </div>
-          <p className="body-copy-lg max-w-2xl lg:justify-self-end">
-            Una ruta completa, apoyo puntual o preparación para una meta concreta. Tres formas diferentes de trabajar con la orientación directa de Alberto.
-          </p>
-        </MotionReveal>
+            <h2 className="section-heading mt-3">No todos necesitan la misma clase para dar el siguiente paso.</h2>
+            <p className="body-copy-lg mt-5 max-w-3xl">
+              Algunos estudiantes buscan una formación completa. Otros llegan con una dificultad que deben resolver ahora o con una fecha importante en el calendario.
+            </p>
+          </MotionReveal>
 
-        <div>
-          {additionalServices.map((program, index) => {
-            const Icon = serviceIcons[program.id as keyof typeof serviceIcons] ?? BookOpenCheck;
+          <MotionArticle id="programa-por-niveles" className="scroll-mt-24 border-t border-brand-navy/20 pt-12 sm:mt-14 sm:pt-14 lg:mt-16">
+            <div className="grid gap-10 lg:grid-cols-[1.12fr_0.88fr] lg:items-end lg:gap-16">
+              <div>
+                <p className="text-xs font-extrabold uppercase tracking-[0.1em] text-brand-red">Para construir desde la base</p>
+                <h3 className="mt-4 max-w-3xl font-heading text-4xl font-normal leading-[1.04] text-brand-navy sm:text-5xl lg:text-6xl">
+                  Un programa que no improvisa el siguiente paso.
+                </h3>
+                <p className="mt-6 max-w-2xl text-base leading-8 text-brand-navy/66">
+                  El Programa de inglés por niveles recorre conversación, comprensión auditiva, lectura y escritura en una secuencia progresiva. Está pensado para quien quiere construir una base sólida y continuar avanzando con orden.
+                </p>
+              </div>
 
-            return (
-              <MotionArticle key={program.id} id={program.id} delay={index * 0.07} className="scroll-mt-24 border-b border-brand-navy/20 py-10 sm:py-12 lg:py-14">
-                <div className="grid gap-7 lg:grid-cols-[0.18fr_0.72fr_1.1fr] lg:gap-10 xl:gap-14">
-                  <div className="flex items-start justify-between lg:block">
-                    <span className="font-heading text-5xl font-normal leading-none text-brand-navy/18 sm:text-6xl">{String(index + 1).padStart(2, "0")}</span>
-                    <Icon size={23} strokeWidth={1.6} className="mt-1 text-brand-teal lg:mt-6" aria-hidden />
+              <dl className="border-y border-brand-navy/20">
+                {[
+                  ["4", "niveles"],
+                  ["14", "módulos por nivel"],
+                  ["4", "habilidades integradas"],
+                ].map(([value, label]) => (
+                  <div key={label} className="grid grid-cols-[5rem_1fr] items-baseline gap-5 border-b border-brand-navy/12 py-5 last:border-b-0 sm:grid-cols-[6rem_1fr]">
+                    <dt className="font-heading text-4xl font-normal text-brand-teal sm:text-5xl">{value}</dt>
+                    <dd className="text-sm font-extrabold uppercase tracking-[0.08em] text-brand-navy/58">{label}</dd>
                   </div>
-
-                  <div>
-                    <p className="text-xs font-extrabold uppercase tracking-[0.1em] text-brand-red">{program.eyebrow}</p>
-                    <h3 className="mt-3 font-heading text-3xl font-normal leading-tight text-brand-navy sm:text-4xl">{program.title}</h3>
-                    <p className="mt-5 text-xs font-extrabold uppercase leading-6 tracking-[0.07em] text-brand-navy/52">
-                      {program.badge}<span className="mx-2 text-brand-navy/20">/</span>{program.format}
-                    </p>
-                    <p className="mt-2 text-xs font-extrabold uppercase leading-6 tracking-[0.07em] text-brand-navy/52">
-                      {program.focus}<span className="mx-2 text-brand-navy/20">/</span>{program.support}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="font-heading text-2xl font-normal leading-snug text-brand-blue sm:text-3xl">{program.headline}</p>
-                    <p className="mt-4 text-sm leading-7 text-brand-navy/66">{program.description}</p>
-
-                    <div className="mt-7 grid gap-x-8 gap-y-3 border-y border-brand-navy/12 py-5 sm:grid-cols-2">
-                      {program.outcomes.map((outcome) => (
-                        <div key={outcome} className="flex items-center gap-2">
-                          <CheckCircle2 size={15} className="shrink-0 text-brand-teal" aria-hidden />
-                          <span className="text-sm font-bold text-brand-navy/74">{outcome}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="mt-5 grid gap-2 sm:grid-cols-[auto_1fr] sm:gap-5">
-                      <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-brand-navy/46">Ideal para</p>
-                      <p className="text-sm leading-6 text-brand-navy/64">{program.bestFor}</p>
-                    </div>
-
-                    <Link href="/contact" className="mt-6 inline-flex items-center gap-2 border-b-2 border-brand-red pb-1 text-sm font-extrabold text-brand-red transition hover:border-brand-red-dark hover:text-brand-red-dark">
-                      Consultar esta opción <ArrowRight size={17} aria-hidden />
-                    </Link>
-                  </div>
-                </div>
-              </MotionArticle>
-            );
-          })}
+                ))}
+              </dl>
+            </div>
+            <p className="mt-9 max-w-3xl border-l-2 border-brand-red pl-5 font-heading text-xl font-normal leading-snug text-brand-blue sm:text-2xl">
+              Una ruta de largo plazo para principiantes y estudiantes intermedios que prefieren saber qué están construyendo y por qué.
+            </p>
+          </MotionArticle>
         </div>
+      </div>
+
+      <MotionArticle id="tutorias-personalizadas" className="scroll-mt-24 bg-brand-navy px-4 py-16 text-white sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+        <div className="mx-auto max-w-6xl">
+          <p className="max-w-5xl font-heading text-3xl font-normal leading-[1.08] sm:text-5xl lg:text-6xl">
+            “A veces avanzar no exige comenzar otro programa. Exige resolver bien lo que hoy le está frenando.”
+          </p>
+          <div className="mt-10 grid gap-8 border-t border-white/18 pt-8 lg:grid-cols-[0.72fr_1.28fr] lg:gap-16">
+            <div>
+              <p className="section-kicker-dark">Tutorías personalizadas</p>
+              <p className="mt-3 text-sm font-bold uppercase tracking-[0.08em] text-white/46">Apoyo puntual · Horario flexible</p>
+            </div>
+            <div>
+              <p className="max-w-2xl text-base leading-8 text-white/70">
+                Una tutoría se concentra en una necesidad concreta: comprender un tema, preparar una asignación, mejorar un texto o practicar una presentación. La sesión empieza en el problema real y termina con un camino más claro para resolverlo.
+              </p>
+              <p className="mt-7 font-heading text-2xl font-normal leading-snug text-brand-teal-light sm:text-3xl">
+                Una duda. Un texto. Una presentación. Un obstáculo específico.
+              </p>
+            </div>
+          </div>
+        </div>
+      </MotionArticle>
+
+      <MotionArticle id="coaching-especializado" className="scroll-mt-24 bg-surface-cream px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid gap-10 lg:grid-cols-[0.82fr_1.18fr] lg:gap-16">
+            <div>
+              <p className="section-kicker">Coaching especializado</p>
+              <h3 className="mt-4 font-heading text-4xl font-normal leading-tight text-brand-navy sm:text-5xl">
+                La fecha está puesta. La preparación también debe estarlo.
+              </h3>
+            </div>
+            <div>
+              <p className="text-base leading-8 text-brand-navy/68">
+                El coaching parte de una situación real y trabaja hacia ella: el lenguaje que necesitará, las preguntas que puede enfrentar, el contexto y la práctica necesaria para responder con mayor claridad.
+              </p>
+              <div className="mt-8 border-y border-brand-navy/20 py-5 font-heading text-2xl font-normal leading-relaxed text-brand-blue sm:text-3xl">
+                Entrevistas <span className="text-brand-red">/</span> Exámenes <span className="text-brand-red">/</span> Negocios <span className="text-brand-red">/</span> Viajes <span className="text-brand-red">/</span> Pronunciación
+              </div>
+              <p className="mt-6 text-sm leading-7 text-brand-navy/62">
+                Recomendado cuando existe una oportunidad, una fecha o un reto específico que requiere preparación intensiva y relevante.
+              </p>
+            </div>
+          </div>
+        </div>
+      </MotionArticle>
+
+      <div className="bg-surface-white px-4 py-12 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
+        <MotionReveal className="mx-auto flex max-w-6xl flex-col gap-6 border-y border-brand-navy/20 py-8 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-extrabold uppercase tracking-[0.1em] text-brand-red">Una decisión, no tres formularios</p>
+            <p className="mt-2 font-heading text-2xl font-normal text-brand-navy sm:text-3xl">Converse con Alberto y defina cuál ruta tiene sentido.</p>
+          </div>
+          <Link href="/contact" className="button-primary shrink-0">Solicitar orientación <ArrowRight size={18} aria-hidden /></Link>
+        </MotionReveal>
       </div>
     </section>
   );
