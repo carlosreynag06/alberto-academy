@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, BookOpenCheck, BriefcaseBusiness, CalendarCheck, CheckCircle2, MessageCircle, PenLine, Target, Users } from "lucide-react";
+import { ArrowRight, BookOpenCheck, BriefcaseBusiness, CalendarCheck, CheckCircle2, Languages, MessageCircle, PenLine, Users } from "lucide-react";
 import { MotionImagePanel, MotionReveal } from "@/components/motion-reveal";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { programTracks } from "@/lib/programs";
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description: "Programas por niveles, clases individuales y grupales, tutorías, coaching especializado y español para extranjeros.",
 };
 
-const serviceIcons = [BookOpenCheck, MessageCircle, Users, PenLine, BriefcaseBusiness, Target];
+const serviceIcons = [BookOpenCheck, MessageCircle, Users, PenLine, BriefcaseBusiness, Languages];
 
 export default function ProgramsPage() {
   return (

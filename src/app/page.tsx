@@ -5,7 +5,7 @@ import { MotionArticle, MotionImagePanel, MotionReveal } from "@/components/moti
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { homepageFaqs } from "@/lib/faqs";
 import { programTracks } from "@/lib/programs";
-import { ArrowRight, BookOpenCheck, CalendarCheck, CheckCircle2, ChevronRight, Compass, GraduationCap, MessagesSquare, Quote, ShieldCheck, Star, Target, Users } from "lucide-react";
+import { ArrowRight, CalendarCheck, CheckCircle2, ChevronRight, Compass, GraduationCap, Languages, MessagesSquare, Quote, ShieldCheck, Star, Target, Users } from "lucide-react";
 
 const stats = [
   { value: "4+", label: "Años de experiencia" },
@@ -13,8 +13,8 @@ const stats = [
   { value: "85%", label: "Método directo" },
 ];
 
-const programIcons = [BookOpenCheck, MessagesSquare, Users];
-const programImagePositions = ["object-[center_18%]", "object-[center_24%]", "object-center"];
+const programIcons = [MessagesSquare, Users, Languages];
+const programImagePositions = ["object-[center_24%]", "object-center", "object-center"];
 
 const philosophy = [
   { title: "Aprendizaje con contexto", copy: "Comprenda palabras y estructuras mediante comparaciones, imágenes, sinónimos, antónimos y situaciones reales.", icon: Compass },
@@ -123,7 +123,9 @@ function About() {
 }
 
 function Programs() {
-  const featuredPrograms = programTracks.slice(0, 3);
+  const featuredPrograms = programTracks.filter((item) =>
+    ["clases-individuales", "clases-grupales", "espanol-para-extranjeros"].includes(item.id),
+  );
   return (
     <section id="programas" className="section-pad relative overflow-hidden bg-brand-navy text-white">
       <div className="program-ring absolute -left-40 top-24 hidden size-[520px] rounded-full opacity-60 blur-2xl md:block" />
@@ -140,7 +142,7 @@ function Programs() {
                 <div className="relative overflow-hidden rounded-lg bg-brand-blue"><Image src={item.image} alt={item.imageAlt} width={1200} height={820} quality={78} sizes="(min-width: 1280px) 360px, (min-width: 768px) 46vw, 100vw" className={`aspect-[4/3] w-full object-cover ${programImagePositions[index]} transition duration-500 group-hover:scale-[1.035]`} /><div className="absolute inset-0 bg-brand-navy/10" /></div>
                 <div className="mt-5 flex flex-wrap gap-2.5"><span className="inline-flex min-h-10 items-center rounded-md bg-brand-red px-3 text-sm font-extrabold text-white">{item.badge}</span><span className="inline-flex min-h-10 items-center rounded-md border border-brand-navy/12 bg-surface-cream px-3 text-sm font-extrabold">{item.format}</span></div>
                 <h3 className="mt-5 font-heading text-2xl font-normal leading-tight sm:text-3xl">{item.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-brand-navy/66">{item.detail}</p>
+                <p className="mt-3 text-sm leading-6 text-brand-navy/66 xl:min-h-12">{item.detail}</p>
                 <div className="mt-5 flex items-center gap-3 border-t border-brand-navy/10 pt-5"><span className="grid size-10 place-items-center rounded-md bg-brand-navy text-white"><Icon size={20} aria-hidden /></span><p className="text-sm font-extrabold uppercase">{item.focus}</p></div>
                 <Link href={`/programs#${item.id}`} className="mt-6 inline-flex items-center justify-between border-t border-brand-navy/10 pt-5 text-sm font-extrabold text-brand-red">Conocer esta opción <ArrowRight size={17} aria-hidden /></Link>
               </MotionArticle>
