@@ -68,10 +68,10 @@ export default function ProgramsPage() {
 
 function PrimaryServices() {
   return (
-    <section id="servicios-principales" className="scroll-mt-20 px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
-      <div className="mx-auto max-w-6xl">
-        <MotionReveal className="grid gap-5 border-b border-brand-navy/12 pb-9 lg:grid-cols-[0.82fr_1.18fr] lg:items-end">
-          <div>
+    <section id="servicios-principales" className="scroll-mt-20 overflow-hidden px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
+      <div className="mx-auto w-full min-w-0 max-w-6xl">
+        <MotionReveal className="grid min-w-0 gap-5 border-b border-brand-navy/12 pb-9 lg:grid-cols-[0.82fr_1.18fr] lg:items-end">
+          <div className="min-w-0">
             <p className="section-kicker">Servicios principales</p>
             <h2 className="section-heading mt-3">Tres formas claras de comenzar.</h2>
           </div>
@@ -80,19 +80,19 @@ function PrimaryServices() {
           </p>
         </MotionReveal>
 
-        <div className="mt-10 grid gap-10 sm:gap-12 lg:gap-14">
+        <div className="mt-10 grid min-w-0 gap-10 sm:gap-12 lg:gap-14">
           {primaryServices.map((program, index) => {
             const Icon = serviceIcons[program.id as keyof typeof serviceIcons] ?? BookOpenCheck;
             const isReversed = index % 2 === 1;
 
             return (
-              <section key={program.id} id={program.id} className="scroll-mt-24 grid max-w-full gap-6 border-b border-brand-navy/12 pb-10 last:border-b-0 last:pb-0 sm:gap-8 sm:pb-12 lg:grid-cols-2 lg:items-stretch lg:gap-12">
-                <MotionImagePanel className={`relative aspect-[4/3] rounded-xl border border-brand-navy/80 bg-transparent p-2 sm:aspect-[16/10] sm:p-3 lg:aspect-auto lg:h-full ${isReversed ? "lg:order-2" : ""}`}>
-                  <div className="relative h-full overflow-hidden rounded-md">
-                    <Image src={program.image} alt={program.imageAlt} fill quality={82} sizes="(min-width: 1180px) 540px, (min-width: 1024px) 48vw, 100vw" className="object-cover object-center" />
+              <section key={program.id} id={program.id} className="grid w-full min-w-0 max-w-full scroll-mt-24 gap-6 overflow-hidden border-b border-brand-navy/12 pb-10 last:border-b-0 last:pb-0 sm:gap-8 sm:pb-12 lg:grid-cols-2 lg:items-stretch lg:gap-12">
+                <MotionImagePanel className={`relative aspect-[4/3] w-full min-w-0 max-w-full overflow-hidden rounded-xl border border-brand-navy/80 bg-transparent p-2 sm:aspect-[16/10] sm:p-3 lg:aspect-auto lg:h-full ${isReversed ? "lg:order-2" : ""}`}>
+                  <div className="relative h-full w-full min-w-0 max-w-full overflow-hidden rounded-md">
+                    <Image src={program.image} alt={program.imageAlt} fill quality={82} sizes="(max-width: 639px) calc(100vw - 3rem), (min-width: 1180px) 540px, (min-width: 1024px) 48vw, 100vw" className="object-cover object-center" />
                     <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/42 via-brand-navy/0 to-transparent" />
                   </div>
-                  <div className="absolute left-5 top-5 rounded-md bg-brand-red px-3 py-2.5 text-white shadow-xl shadow-brand-red/20 sm:px-4 sm:py-3">
+                  <div className="absolute left-4 top-4 max-w-[calc(100%_-_2rem)] rounded-md bg-brand-red px-3 py-2.5 text-white shadow-xl shadow-brand-red/20 sm:left-5 sm:top-5 sm:max-w-[calc(100%_-_2.5rem)] sm:px-4 sm:py-3">
                     <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-white/72">Servicio {String(index + 1).padStart(2, "0")}</p>
                     <p className="mt-1 font-heading text-lg font-normal sm:text-xl">{program.badge}</p>
                   </div>
@@ -101,7 +101,7 @@ function PrimaryServices() {
                   </div>
                 </MotionImagePanel>
 
-                <MotionReveal delay={0.1} className={`flex min-w-0 flex-col justify-between p-2 sm:p-4 lg:p-5 xl:p-6 ${isReversed ? "lg:order-1" : ""}`}>
+                <MotionReveal delay={0.1} className={`flex w-full min-w-0 max-w-full flex-col justify-between px-0 py-2 sm:p-4 lg:p-5 xl:p-6 ${isReversed ? "lg:order-1" : ""}`}>
                   <div>
                     <div className="grid size-10 place-items-center rounded-lg bg-brand-blue text-white"><Icon size={20} strokeWidth={1.8} aria-hidden /></div>
                     <p className="section-kicker mt-4">{program.eyebrow}</p>
@@ -122,7 +122,7 @@ function PrimaryServices() {
                       <p className="text-sm font-extrabold uppercase tracking-[0.08em] text-brand-navy/48">Ideal para</p>
                       <p className="mt-2 text-sm leading-6 text-brand-navy/66">{program.bestFor}</p>
                     </div>
-                    <Link href="/contact" className="button-primary mt-5">Consultar esta opción <ArrowRight size={18} aria-hidden /></Link>
+                    <Link href="/contact" className="button-primary mt-5 box-border max-w-full min-w-0 whitespace-normal px-4 text-center sm:w-fit"><span className="min-w-0">Consultar esta opción</span><ArrowRight size={18} className="shrink-0" aria-hidden /></Link>
                   </div>
                 </MotionReveal>
               </section>
